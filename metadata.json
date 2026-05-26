@@ -1,0 +1,8 @@
+{
+  "name": "Neeta's Eyebrow Threading & Beauty Salon",
+  "description": "Premium eyebrow threading, skincare, and beauty services homepage with booking integration and Google reviews.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
