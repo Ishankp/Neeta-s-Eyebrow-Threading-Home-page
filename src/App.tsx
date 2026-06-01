@@ -25,7 +25,12 @@ import {
   Menu, 
   X,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Palette,
+  Eye,
+  Wand2,
+  Flame,
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ALL_SERVICES } from './constants';
@@ -67,9 +72,9 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', href: '#' },
     { name: 'Services', href: '#services' },
-    { name: 'Reviews', href: '#reviews' },
     { name: 'Aftercare', href: '#aftercare' },
     { name: 'FAQ', href: '#faq' },
+    { name: 'Reviews', href: '#reviews' },
     { name: 'Contact', href: '#contact' },
   ];
 
@@ -226,53 +231,118 @@ const Hero = () => {
   );
 };
 
-const Services = () => {
-  const featuredServices = ALL_SERVICES.slice(0, 4);
+const SHOWCASE_CATEGORIES = [
+  {
+    name: "Threading or Waxing",
+    description: "Our signature organic hair removal services mapped precisely to define and lift your natural symmetry.",
+    highlights: ["Custom Eyebrow Mapping", "Upper Lip, Chin & Sideburns", "Full Face Gentle Care"],
+    startingPrice: "From $4",
+    linkHash: "Threading or Waxing",
+    icon: Scissors,
+    colorClass: "text-amber-700 bg-amber-50 border-amber-200"
+  },
+  {
+    name: "Tinting",
+    description: "Safe, botanical semi-permanent dyes that enrich the depth, volume, and definition of lashes and brows.",
+    highlights: ["Eyebrow Deep-Hues", "Eyelash Darkening", "Rich Color for 4-6 Weeks"],
+    startingPrice: "From $25",
+    linkHash: "Tinting",
+    icon: Palette,
+    colorClass: "text-purple-700 bg-purple-50 border-purple-200"
+  },
+  {
+    name: "Lamination & Lift",
+    description: "Advanced structural solutions that redirect eyebrow fluff and lift lash roots upwards for a bright-eyed gaze.",
+    highlights: ["Natural Eyelash Lift Curls", "Feathered Brow Lamination", "Up to 8 Weeks Shape Retention"],
+    linkHash: "Lamination and Lift",
+    startingPrice: "From $85",
+    icon: Wand2,
+    colorClass: "text-emerald-700 bg-emerald-50 border-emerald-200"
+  },
+  {
+    name: "Facials",
+    description: "Rejuvenating, multi-phase skin therapies using premium steam, exfoliating scrubs, massages, and clarifying masks.",
+    highlights: ["Mini 30m Micro-Glow", "Deluxe 60m Skin Massage", "Deep Hydrating Treatments"],
+    startingPrice: "From $49",
+    linkHash: "Facials",
+    icon: Sparkles,
+    colorClass: "text-sky-700 bg-sky-50 border-sky-200"
+  },
+  {
+    name: "Eyelash Extension",
+    description: "Classic lashes, gorgeous strips, or temporary fillers compiled to elevate your lash volume instantly.",
+    highlights: ["Eyelash Extensions Set", "Temporary Strip Application", "Quick 10m Lash Touch-Ups"],
+    startingPrice: "From $15",
+    linkHash: "Eyelash Extension",
+    icon: Eye,
+    colorClass: "text-rose-700 bg-rose-50 border-rose-200"
+  },
+  {
+    name: "Body Waxing",
+    description: "Smooth, clean body care using premium low-temperature resin wax applied with hygiene and expert technique.",
+    highlights: ["Full & Half Leg Options", "Underarms & Arms Care", "Genten Brazilian Sessions"],
+    startingPrice: "From $25",
+    linkHash: "Body Wax",
+    icon: Flame,
+    colorClass: "text-stone-700 bg-stone-50 border-stone-200"
+  }
+];
 
+const Services = () => {
   return (
-    <section id="services" className="py-24 bg-stone-50 border-y border-stone-200">
+    <section id="services" className="py-16 bg-stone-50/40 relative">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
           <div className="max-w-2xl">
             <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-               <Sparkles className="w-4 h-4" /> Guest Favorites
+               <Sparkles className="w-4 h-4" /> Treatment Menu
             </h2>
             <h3 className="text-4xl md:text-5xl font-bold text-stone-900 tracking-tight">
-              Our Most Popular <span className="italic font-serif text-brand-700">Services</span>.
+              Explore Our <span className="italic font-serif text-brand-700">Services</span>.
             </h3>
           </div>
-          <p className="text-stone-500 max-w-sm mb-2">
-            A selection of our most requested treatments. Visit our full menu for a complete list of beauty options.
+          <p className="text-stone-500 max-w-sm mb-2 text-sm">
+            Discover our tailored beauty treatments. Tap any category to view full service details, aftercare guides, and exact timing.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredServices.map((service, index) => (
-            <motion.div 
-              key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group bg-white p-8 rounded-[2.5rem] border border-stone-200 hover:border-brand-300 transition-all shadow-md hover:shadow-2xl hover:shadow-brand-500/10 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <h4 className="text-xl font-bold text-stone-900 group-hover:text-brand-700 transition-colors leading-tight">{service.name}</h4>
-                  <span className="text-brand-600 font-bold bg-stone-50 px-3 py-1 rounded-full shadow-sm text-sm border border-stone-200 text-nowrap">{service.price}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {SHOWCASE_CATEGORIES.map((category, index) => {
+            return (
+              <motion.div 
+                key={category.name}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08 }}
+                className="group bg-white p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-stone-150 hover:border-brand-200 transition-all shadow-sm hover:shadow-xl hover:shadow-brand-600/5 flex flex-col justify-between"
+              >
+                <div>
+                  {/* Category Details */}
+                  <h4 className="text-base md:text-xl font-bold text-stone-900 group-hover:text-brand-800 transition-colors leading-tight mb-2 md:mb-3">
+                    {category.name}
+                  </h4>
+                  <p className="text-[11px] md:text-xs text-stone-500 leading-relaxed mb-4 md:mb-6">
+                    {category.description}
+                  </p>
                 </div>
-                <p className="text-sm text-stone-500 leading-relaxed line-clamp-3">{service.description}</p>
-              </div>
-              <div className="mt-8 pt-6 border-t border-stone-100 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-stone-400 uppercase tracking-widest">
-                  <Clock className="w-3.5 h-3.5" /> 20-45 MIN
-                </div>
-                <div className="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center text-brand-600 shadow-sm border border-stone-200 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
+
+                {/* Explore Action Link */}
+                <Link 
+                  to={`/services#${category.linkHash}`}
+                  className="pt-3 md:pt-4 border-t border-stone-50 flex items-center justify-between text-brand-700 font-bold text-[11px] md:text-xs hover:text-brand-800 transition-colors group/link"
+                >
+                  <span>
+                    <span className="hidden sm:inline">View Services Menu</span>
+                    <span className="sm:hidden">View Menu</span>
+                  </span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-stone-50 flex items-center justify-center border border-stone-200 group-hover/link:bg-brand-600 group-hover/link:text-white group-hover/link:border-brand-600 transition-all">
+                    <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5" />
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
 
         <div className="mt-16 text-center">
@@ -280,7 +350,7 @@ const Services = () => {
             to="/services" 
             className="inline-flex items-center gap-2 bg-stone-900 text-white px-10 py-5 rounded-2xl font-bold hover:bg-brand-600 transition-all shadow-xl hover:-translate-y-1 group"
           >
-            See More Services <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            See Full Menu & Deals <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>
@@ -290,11 +360,11 @@ const Services = () => {
 
 const Aftercare = () => {
   return (
-    <section id="aftercare" className="py-24 bg-white border-t border-stone-200">
+    <section id="aftercare" className="py-16 bg-white relative">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-4">Post-Treatment</h2>
-        <h3 className="text-4xl md:text-5xl font-bold text-stone-900 mb-6 tracking-tight">After Care Instructions</h3>
-        <p className="text-stone-500 max-w-2xl mx-auto mb-12">
+        <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-3">Post-Treatment</h2>
+        <h3 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 tracking-tight">After Care Instructions</h3>
+        <p className="text-stone-500 max-w-2xl mx-auto mb-8 text-sm">
           Proper aftercare is essential to achieving long-lasting, beautifully defined results. 
           Select one of our popular services below to view step-by-step guidelines.
         </p>
@@ -433,13 +503,13 @@ const Reviews = () => {
   }, [liveReviews, showAll]);
 
   return (
-    <section id="reviews" className="py-24 bg-stone-100/50 relative overflow-hidden border-t border-stone-200">
+    <section id="reviews" className="py-16 bg-stone-100/30 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-100 rounded-full blur-3xl opacity-30"></div>
       <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-stone-200 rounded-full blur-3xl opacity-30"></div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
@@ -535,14 +605,14 @@ const Reviews = () => {
 
 const BookingBanner = () => {
   return (
-    <section className="bg-brand-900 py-20 relative overflow-hidden">
+    <section className="bg-brand-900 py-12 relative overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-[800px] h-[800px] bg-brand-800 rounded-full blur-[120px] opacity-20"></div>
       </div>
       
       <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">Ready to Reveal Your Best Self?</h2>
-        <p className="text-brand-100/80 mb-10 text-lg">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Ready to Reveal Your Best Self?</h2>
+        <p className="text-brand-100/80 mb-6 text-base">
           Secure your spot today and let Neeta provide you with a beauty experience 
           that leaves you feeling refreshed, confident, and beautiful.
         </p>
@@ -550,7 +620,7 @@ const BookingBanner = () => {
           href="https://square.site/book/SKFJHMBQK1YXY/neeta-s-eyebrow-threading-and-beauty-care-winter-garden-fl" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 bg-white text-brand-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-brand-50 transition-all shadow-2xl hover:scale-105"
+          className="inline-flex items-center gap-3 bg-white text-brand-900 px-8 py-4 rounded-xl font-black text-base hover:bg-brand-50 transition-all shadow-2xl hover:scale-105"
         >
           Book via Square <ArrowRight className="w-6 h-6" />
         </a>
@@ -600,9 +670,9 @@ const FAQItem = ({ question, answer }: { question: string; answer: string; key?:
 
 const FAQ = () => {
   return (
-    <section id="faq" className="py-24 bg-stone-50/50 border-t border-stone-200">
+    <section id="faq" className="py-16 bg-stone-50/30 relative">
       <div className="max-w-4xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <span className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-4 block">Frequently Asked Questions</span>
           <h3 className="text-4xl md:text-5xl font-black text-stone-900 tracking-tight">Got Questions?</h3>
         </div>
@@ -621,10 +691,10 @@ const FAQ = () => {
 
 const Contact = () => {
   return (
-    <section id="contact" className="py-24 bg-white border-t border-stone-200">
+    <section id="contact" className="py-16 bg-white relative">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-4">Find Us</h2>
-        <h3 className="text-4xl md:text-5xl font-bold text-stone-900 mb-16 tracking-tight">Visit the <span className="italic font-serif text-brand-700">Salon</span></h3>
+        <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-3">Find Us</h2>
+        <h3 className="text-4xl md:text-5xl font-bold text-stone-900 mb-10 tracking-tight">Visit the <span className="italic font-serif text-brand-700">Salon</span></h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center max-w-5xl mx-auto pb-12 border-b border-stone-200">
           <div className="flex flex-col items-center">
@@ -729,9 +799,9 @@ function HomePage() {
       <Hero />
       <Services />
       <BookingBanner />
-      <Reviews />
       <Aftercare />
       <FAQ />
+      <Reviews />
       <Contact />
       <Footer />
     </>

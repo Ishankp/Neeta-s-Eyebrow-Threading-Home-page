@@ -7,21 +7,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Sparkles, Clock, CheckCircle2, MoreHorizontal, X, FileText, HelpCircle, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ALL_SERVICES, Service } from '../constants';
+import { ALL_SERVICES, Service, Category, CATEGORIES } from '../constants';
 import { getFaqsForService, getAftercareForService } from '../data/careData';
-
-type Category = "Threading" | "Tinting" | "Deal Prices" | "Permanent" | "Eyelash Extensions" | "Lamination" | "Facials" | "Body Wax";
-
-const CATEGORIES: Category[] = [
-  "Threading",
-  "Tinting",
-  "Deal Prices",
-  "Permanent",
-  "Eyelash Extensions",
-  "Lamination",
-  "Facials",
-  "Body Wax"
-];
 
 interface ServiceDetail {
   postCare?: {
@@ -41,7 +28,14 @@ export default function ServicesPage() {
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (window.location.hash) {
+      const hash = decodeURIComponent(window.location.hash.substring(1));
+      setTimeout(() => {
+        scrollToSection(hash);
+      }, 150);
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, []);
 
   // Update active category on scroll
@@ -206,7 +200,11 @@ export default function ServicesPage() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <span className="text-lg font-black text-brand-600 block">{service.price}</span>
-                      <div className="text-[10px] font-bold text-stone-300 uppercase tracking-tighter mt-1 mb-8">20m</div>
+                      {service.length && (
+                        <div className="text-[10px] font-bold text-stone-400 uppercase tracking-tighter mt-1 mb-6">
+                          {service.length}
+                        </div>
+                      )}
                     </div>
 
                     {(() => {
