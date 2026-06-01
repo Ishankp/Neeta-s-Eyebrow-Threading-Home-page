@@ -14,6 +14,28 @@ const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 const client = new Client({});
 
+function formatReviewDate(timestampSec: number): string {
+  if (!timestampSec) return 'Recent';
+  const reviewDate = new Date(timestampSec * 1000);
+  const now = new Date();
+  
+  const diffMs = now.getTime() - reviewDate.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const formattedDate = reviewDate.toLocaleDateString('en-US', options);
+
+  if (diffDays <= 0) {
+    return `Today (${formattedDate})`;
+  } else if (diffDays === 1) {
+    return `1 day ago (${formattedDate})`;
+  } else if (diffDays < 30) {
+    return `${diffDays} days ago (${formattedDate})`;
+  } else {
+    return formattedDate;
+  }
+}
+
 async function getReviews() {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   const placeId = process.env.GOOGLE_PLACE_ID;
@@ -29,28 +51,31 @@ async function getReviews() {
         place_id: placeId,
         key: apiKey,
         fields: ['reviews', 'rating', 'user_ratings_total'],
-        language: Language.en
-      }
+        language: Language.en,
+        reviews_sort: 'newest'
+      } as any
     });
 
     const data = response.data.result;
-    
-    // Filter for 5 star reviews only
-    const reviews = (data.reviews || [])
+    const rawReviews = data.reviews || [];
+
+    // Filter for 5 star reviews only and format
+    const reviews = rawReviews
       .filter((r: any) => r.rating === 5)
       .map((r: any) => ({
-        id: r.time.toString() + r.author_name,
+        id: (r.time || Date.now()).toString() + r.author_name,
         author: r.author_name,
         rating: r.rating,
         comment: r.text,
-        date: r.relative_time_description,
+        date: formatReviewDate(r.time),
         avatar: r.profile_photo_url
       }));
 
     return {
-      reviews,
+      reviews, // This will be the most recent 5-star reviews
       rating: data.rating,
       totalReviews: data.user_ratings_total,
+      placeId,
       updatedAt: Date.now()
     };
   } catch (error) {
@@ -66,7 +91,22 @@ app.get('/api/reviews', async (req, res) => {
       cacheData = await fs.readJson(CACHE_FILE);
     }
 
-    const isOld = !cacheData || (Date.now() - cacheData.updatedAt > CACHE_TTL);
+    const currentPlaceId = process.env.GOOGLE_PLACE_ID;
+    
+    // Check if cache contains incorrect mock data (e.g. food/materials reviews)
+    const hasMockKeywords = cacheData && cacheData.reviews?.some((r: any) => 
+      r.comment?.toLowerCase().includes('breakfast') || 
+      r.comment?.toLowerCase().includes('delicious food') ||
+      r.comment?.toLowerCase().includes('materials for my project')
+    );
+
+    // Force refresh if cached place_id does not match current configured place_id
+    const isDifferentPlace = cacheData && cacheData.placeId && currentPlaceId && cacheData.placeId !== currentPlaceId;
+
+    const isOld = !cacheData || 
+                  (Date.now() - cacheData.updatedAt > CACHE_TTL) || 
+                  hasMockKeywords || 
+                  isDifferentPlace;
 
     if (isOld && process.env.GOOGLE_MAPS_API_KEY) {
       const liveData = await getReviews();

@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Clock, AlertTriangle, Calendar, Heart, ExternalLink, Shield, Sun } from 'lucide-react';
+import { ArrowLeft, Sparkles, Clock, AlertTriangle, Calendar, Heart, ExternalLink, Shield, Sun, FileDown } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getAftercareById } from '../data/careData';
+import { generateAftercarePDF } from '../utils/pdfGenerator';
 
 interface AftercarePageProps {
   title?: string;
@@ -69,15 +70,27 @@ export default function AftercarePage({ title: propTitle, type: propType }: Afte
       {/* Hero Banner Section */}
       <section className="bg-white border-b border-stone-200 py-16 px-6">
         <div className="max-w-3xl mx-auto text-left">
-          <span className="text-xs font-black uppercase tracking-widest text-brand-600 bg-brand-50 border border-brand-100 px-4 py-1.5 rounded-full inline-block mb-4">
-            Post-Treatment Guide &bull; {data.category}
-          </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-stone-950 mb-4 capitalize">
-            {title}
-          </h1>
-          <p className="text-stone-500 text-lg max-w-2xl leading-relaxed font-medium">
-            {data.description}
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-4 max-w-2xl">
+              <span className="text-xs font-black uppercase tracking-widest text-brand-600 bg-brand-50 border border-brand-100 px-4 py-1.5 rounded-full inline-block">
+                Post-Treatment Guide &bull; {data.category}
+              </span>
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-stone-950 capitalize font-serif italic">
+                {title}
+              </h1>
+              <p className="text-stone-500 text-lg leading-relaxed font-medium">
+                {data.description}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <button 
+                onClick={() => generateAftercarePDF(data, title)}
+                className="inline-flex items-center gap-2.5 bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs uppercase tracking-widest px-6 py-4 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 duration-200 cursor-pointer"
+              >
+                <FileDown className="w-5 h-5" /> Download PDF Guide
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -498,7 +511,13 @@ export default function AftercarePage({ title: propTitle, type: propType }: Afte
                 </div>
               </div>
 
-              <div className="mt-8 flex justify-center gap-4">
+              <div className="mt-8 flex justify-center gap-4 flex-wrap">
+                <button 
+                  onClick={() => generateAftercarePDF(data, title)}
+                  className="inline-flex items-center gap-2 border border-brand-500 bg-brand-600 text-white font-bold text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl transition-all hover:bg-brand-500 cursor-pointer"
+                >
+                  <FileDown className="w-4 h-4" /> Download PDF Guide
+                </button>
                 <button 
                   onClick={() => navigate('/')}
                   className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl transition-all"

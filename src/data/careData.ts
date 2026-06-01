@@ -163,7 +163,12 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
     serviceIds: ["tw1", "tw2", "tw3", "tw4", "tw5", "tw6", "tw7", "tw8", "tw9", "tw10", "tw11", "bw1", "bw2", "bw3", "bw4", "bw5", "bw6", "bw7", "bw8", "dp1", "dp2", "dp5", "dp7"],
     timeline: [
       {
-        time: "First 24–48 Hours",
+        time: "First 24 Hours",
+        title: "Skip Heavy Products",
+        details: "Do not apply heavily scented lotions, perfumes, or harsh chemicals (like those containing alcohol or strong acids) to the area for at least 24 hours."
+      },
+      {
+        time: "First 24-48 Hours",
         title: "Keep it Clean and Cool",
         details: "Avoid hot baths, saunas, steam rooms, or vigorous exercise for the first 24–48 hours. Excessive heat and sweat can irritate open follicles; use lukewarm water when showering."
       },
@@ -178,24 +183,19 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
         details: "Wear loose-fitting, natural fiber clothing (like cotton) to prevent friction and allow your skin to breathe."
       },
       {
-        time: "First 24 Hours",
-        title: "Skip Heavy Products",
-        details: "Do not apply heavily scented lotions, perfumes, or harsh chemicals (like those containing alcohol or strong acids) to the area for at least 24 hours."
+        time: "Daily Care / Ongoing Care",
+        title: "Hydrate and Soothe",
+        details: "Use a mild, calming moisturizer (like pure Aloe Vera) daily to keep the skin hydrated and supple. Note: if you notice any redness or minor bumps, this is normal and will subside within 24–48 hours."
       },
       {
-        time: "Ongoing Care",
-        title: "Sun Protection",
-        details: "Your skin is more sensitive to UV rays after waxing. Keep the area covered or use a gentle, fragrance-free SPF if exposure is unavoidable."
-      },
-      {
-        time: "After 48–72 Hours",
+        time: "Daily Care / Ongoing Care",
         title: "The Exfoliation Rule",
         details: "Wait at least 48–72 hours before you begin exfoliating. Once that window has passed, gently exfoliate the area 2–3 times a week to prevent dead skin cells from trapping hairs and causing ingrowns."
       },
       {
-        time: "Daily Care",
-        title: "Hydrate",
-        details: "Use a mild, calming moisturizer (like pure Aloe Vera) to keep the skin hydrated and supple. Note: If you notice any redness or minor bumps, don’t panic! This is a normal reaction and should subside within 24–48 hours with proper care."
+        time: "Daily Care / Ongoing Care",
+        title: "Sun Protection",
+        details: "Your skin is more sensitive to UV rays after waxing. Keep the area covered or use a gentle, fragrance-free SPF if exposure is unavoidable."
       }
     ],
     avoid: [
@@ -236,11 +236,6 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
         time: "Ongoing Care",
         title: "Use Oil-Free Products Only",
         details: "Oil-based cleansers, eye drops, makeup removers, and face creams dissolve lash glue rapidly. Always choose oil-free alternatives."
-      },
-      {
-        time: "Every 2-3 Weeks",
-        title: "Book Infill Touch-ups",
-        details: "Our natural eyelashes shed daily. Schedule touch-up infills every 2-3 weeks to replace shed lashes and keep the look perfectly dense."
       }
     ],
     avoid: [
