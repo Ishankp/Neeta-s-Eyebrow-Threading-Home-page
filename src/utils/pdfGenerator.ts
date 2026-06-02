@@ -42,7 +42,7 @@ export function generateAftercarePDF(data: AftercareGuide, pageTitle: string) {
     doc.setFont('Helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(156, 163, 175); // Light Gray
-    doc.text("NEETA'S EYEBROW THREADING & BEAUTY SALON  |  POST-TREATMENT AFTERCARE", margin, 15);
+    doc.text("NEETA'S EYEBROW THREADING  |  POST-TREATMENT AFTERCARE", margin, 15);
     doc.setDrawColor(229, 231, 235); // border-gray-200
     doc.setLineWidth(0.2);
     doc.line(margin, 17, pageWidth - margin, 17);
@@ -107,7 +107,7 @@ export function generateAftercarePDF(data: AftercareGuide, pageTitle: string) {
   doc.setTextColor(cDeepBlue[0], cDeepBlue[1], cDeepBlue[2]);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text("NEETA'S BEAUTY AFTERCARE COURIER", margin + 6, y + 8);
+  doc.text("NEETA'S EYEBROW THREADING AFTERCARE COURIER", margin + 6, y + 8);
 
   doc.setTextColor(cCharcoal[0], cCharcoal[1], cCharcoal[2]);
   doc.setFontSize(20);
@@ -402,6 +402,6 @@ export function generateAftercarePDF(data: AftercareGuide, pageTitle: string) {
   doc.text("Book touch-ups or followups at www.neetasbeauty.com or (555) 012-3456.", pageWidth / 2, y, { align: 'center' });
 
   // Save the generated document
-  const fileName = `Neeta_Beauty_${data.id}_Aftercare.pdf`;
+  const fileName = `Neeta_Eyebrow_Threading_${data.id}_Aftercare.pdf`;
   doc.save(fileName);
 }

@@ -90,7 +90,7 @@ const Navbar = () => {
             <Sparkles className="text-white w-6 h-6" />
           </div>
           <span className={`text-xl font-medium tracking-tight ${isScrolled ? 'text-brand-900' : 'text-white'}`}>
-            <span className="font-bold">Neeta's</span> Beauty
+            <span className="font-bold">Neeta's</span> Eyebrow Threading
           </span>
         </div>
 
@@ -625,7 +625,7 @@ const BookingBanner = () => {
           Book via Square <ArrowRight className="w-6 h-6" />
         </a>
         <p className="mt-6 text-brand-300 text-xs font-bold uppercase tracking-widest">
-          No Walk-ins - Appointments Only
+          Walk-ins Welcome!
         </p>
       </div>
     </section>
@@ -745,7 +745,7 @@ const Footer = () => {
               <div className="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center">
                 <Sparkles className="text-white w-6 h-6" />
               </div>
-              <span className="text-2xl font-bold tracking-tight">Neeta's <span className="text-brand-400">Beauty</span></span>
+              <span className="text-2xl font-bold tracking-tight">Neeta's <span className="text-brand-400">Eyebrow Threading</span></span>
             </div>
             <p className="text-stone-400 max-w-sm mb-6 leading-relaxed">
               We specialize in the timeless art of threading and holistic beauty 
@@ -771,16 +771,17 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-lg mb-6">Salon Hours</h4>
             <ul className="space-y-4 text-stone-400 text-sm">
-              <li className="flex justify-between"><span>Mon - Fri</span> <span>10am - 7pm</span></li>
-              <li className="flex justify-between"><span>Saturday</span> <span>9am - 6pm</span></li>
-              <li className="flex justify-between"><span>Sunday</span> <span className="text-brand-500 font-bold italic underline">By Appointment</span></li>
+              <li className="flex justify-between"><span>Mon - Wed</span> <span>10am - 6pm</span></li>
+              <li className="flex justify-between"><span>Thu - Fri</span> <span>10am - 7pm</span></li>
+              <li className="flex justify-between"><span>Saturday</span> <span>10pm - 5am</span></li>
+              <li className="flex justify-between"><span>Sunday</span> <span className="text-stone-500 font-bold uppercase tracking-wider">Closed</span></li>
             </ul>
           </div>
         </div>
         
         <div className="pt-12 border-t border-stone-800 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-stone-500 text-xs font-medium">
-            &copy; {new Date().getFullYear()} Neeta's Eyebrow Threading & Beauty Salon. All rights reserved.
+            &copy; {new Date().getFullYear()} Neeta's Eyebrow Threading. All rights reserved.
           </p>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-stone-500">
             <a href="#" className="hover:text-brand-400 transition-colors">Privacy Policy</a>

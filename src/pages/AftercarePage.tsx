@@ -61,7 +61,7 @@ export default function AftercarePage({ title: propTitle, type: propType }: Afte
               <Sparkles className="text-white w-3 h-3" />
             </div>
             <span className="text-xs font-semibold uppercase tracking-tight text-brand-900">
-              Neeta's Beauty
+              Neeta's Eyebrow Threading
             </span>
           </div>
         </div>

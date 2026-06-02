@@ -50,12 +50,12 @@ export const FAQS: FAQItemData[] = [
   },
   {
     question: "How long does eyebrow tinting last, and how does it work?",
-    answer: "Eyebrow tinting uses a safe semi-permanent vegetable dye to naturally deepen your brow color, and will lightly stain the skin underneath to fill out any sparse spots. The skin stain usually lasts up to 5-7 days, while the gorgeous depth on the brow hairs remains richly visible for 4 to 6 weeks depending on your skincare routines.",
+    answer: "Eyebrow/lash tinting is only for dyeing the hair, not the skin, and it will last 1-2 weeks depending on care. Refer to the Aftercare document to learn more.",
     serviceIds: ["t1", "t2", "dp3", "dp4", "dp6", "ll3"]
   },
   {
     question: "What is a Lash Lift, and is it safe for my natural eyelashes?",
-    answer: "Yes, it is completely safe! A Lash Lift is a premium treatment that curls and lifts your natural eyelashes from the core root, giving you the appearance of wearing mascara or using an eyelash curler. The results last for 6 to 8 weeks in synchronization with your natural lash growth cycle, with zero hassle.",
+    answer: "Yes, it is completely safe! A Lash Lift is a premium treatment that curls and lifts your natural eyelashes from the core root, giving you the appearance of wearing mascara or using an eyelash curler. The results will last between 4 to 6 weeks depending on your natural lash growth cycle, with zero hassle.",
     serviceIds: ["ll1", "ll2"]
   },
   {
@@ -71,9 +71,9 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
     title: "Tinting after care",
     subtitle: "Eyebrow & Lash Tinting Post-Care",
     category: "Color Definition",
-    description: "Lock in and protect the richness and depth of your semi-permanent lash or brow vegetable tint.",
+    description: "Lock in and protect the richness and depth of your semi-permanent lash or brow tint.",
     criticalPhase: "First 24 hours of pigment absorption",
-    expectedResults: "Full, rich color and dark lash depth for up to 4-6 weeks",
+    expectedResults: "Full, rich color and dark lash depth for up to 1-2 weeks depending on care",
     serviceIds: ["t1", "t2", "dp3", "dp4", "dp6", "ll3"],
     timeline: [
       {
@@ -116,7 +116,7 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
     category: "Brow & Lash Curation",
     description: "Refine and maintain that beautifully feathered brow alignment and upward natural lash curve.",
     criticalPhase: "First 24 to 48 hours is essential for setting",
-    expectedResults: "Perfected, lifted brows and curved lashes for up to 6-8 weeks",
+    expectedResults: "Perfected, lifted brows and curved lashes for up to 4-6 weeks",
     serviceIds: ["ll1", "ll2", "ll3"],
     timeline: [
       {

@@ -115,7 +115,7 @@ export default function ServicesPage() {
             <div className="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center">
               <Sparkles className="text-white w-4 h-4" />
             </div>
-            <span className="font-bold tracking-tight text-brand-900">Neeta's <span className="font-normal text-stone-500">Beauty</span></span>
+            <span className="font-bold tracking-tight text-brand-900">Neeta's <span className="font-normal text-stone-500">Eyebrow Threading</span></span>
           </div>
         </div>
       </nav>
@@ -261,7 +261,7 @@ export default function ServicesPage() {
       </main>
 
       <footer className="mt-24 py-12 text-center text-stone-300 text-xs">
-        &copy; {new Date().getFullYear()} Neeta's Eyebrow Threading & Beauty Salon
+        &copy; {new Date().getFullYear()} Neeta's Eyebrow Threading
       </footer>
 
       {/* Info Modal / progressive disclosure drawer */}
