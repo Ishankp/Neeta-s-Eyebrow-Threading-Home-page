@@ -50,7 +50,7 @@ export function generateAftercarePDF(data: AftercareGuide, pageTitle: string) {
     // Footer
     doc.line(margin, pageHeight - 17, pageWidth - margin, pageHeight - 17);
     doc.text(`Page ${pageNum}`, pageWidth - margin - 12, pageHeight - 12);
-    doc.text("Contact Support: (555) 012-3456  |  www.neetasbeauty.com", margin, pageHeight - 12);
+    doc.text("Contact Support: (407) 614-8138  |  Instagram: @neetaseyebrowthreading", margin, pageHeight - 12);
   }
 
   // Helper: Draw elegant title headers for sections
@@ -399,7 +399,7 @@ export function generateAftercarePDF(data: AftercareGuide, pageTitle: string) {
   doc.setTextColor(115, 115, 115);
   doc.text("If you notice severe pain, swelling, or have queries, phone us immediately.", pageWidth / 2, y, { align: 'center' });
   y += 4;
-  doc.text("Book touch-ups or followups at www.neetasbeauty.com or (555) 012-3456.", pageWidth / 2, y, { align: 'center' });
+  doc.text("Book touch-ups or followups via our booking link, social media, or call (407) 614-8138.", pageWidth / 2, y, { align: 'center' });
 
   // Save the generated document
   const fileName = `Neeta_Eyebrow_Threading_${data.id}_Aftercare.pdf`;

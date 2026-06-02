@@ -15,7 +15,6 @@ import {
   Facebook, 
   MapPin, 
   Phone, 
-  Mail, 
   Star, 
   ArrowRight, 
   CheckCircle2, 
@@ -37,6 +36,7 @@ import { ALL_SERVICES } from './constants';
 import ServicesPage from './pages/ServicesPage';
 import AftercarePage from './pages/AftercarePage';
 import { FAQS, AFTERCARE_GUIDES } from './data/careData';
+import { RatingStars } from './components/RatingStars';
 
 // Types
 interface Service {
@@ -166,7 +166,7 @@ const Navbar = () => {
   );
 };
 
-const Hero = () => {
+const Hero = ({ stats }: { stats: { rating: number; total: number } }) => {
   return (
     <section className="relative h-screen min-h-[700px] flex items-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -187,9 +187,15 @@ const Hero = () => {
           transition={{ duration: 0.8 }}
           className="max-w-2xl text-white"
         >
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/20">
-            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            <span className="text-xs font-bold uppercase tracking-widest italic">Top Rated Beauty Salon in the Area</span>
+          <div className="inline-flex flex-wrap items-center gap-3 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl mb-6 shadow-xl border border-white text-stone-900 max-w-full">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-sm font-black text-brand-900">{stats.rating}</span>
+              <RatingStars rating={stats.rating} size={14} />
+            </div>
+            <span className="h-4.5 w-[1px] bg-stone-200 hidden min-[380px]:block"></span>
+            <span className="text-xs font-bold text-stone-600 tracking-wide uppercase leading-none">
+              {stats.total} Google Reviews
+            </span>
           </div>
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-none mb-6">
             Elegance <br />
@@ -441,35 +447,17 @@ const REVIEWS: Review[] = [
     }
   ];
 
-const Reviews = () => {
+const Reviews = ({ 
+  stats, 
+  liveReviews, 
+  loading 
+}: { 
+  stats: { rating: number; total: number }; 
+  liveReviews: Review[]; 
+  loading: boolean;
+}) => {
   const [showAll, setShowAll] = useState(false);
-  const [liveReviews, setLiveReviews] = useState<Review[]>([]);
-  const [stats, setStats] = useState({ rating: 4.9, total: 520 });
-  const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch('/api/reviews');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.reviews && data.reviews.length > 0) {
-            setLiveReviews(data.reviews);
-            setStats({ 
-              rating: data.rating || 4.9, 
-              total: data.totalReviews || 520 
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReviews();
-  }, []);
 
   const reviewsToDisplay = liveReviews.length > 0 ? liveReviews : REVIEWS;
   const initialReviewsCount = reviewsToDisplay.length;
@@ -515,11 +503,7 @@ const Reviews = () => {
             whileInView={{ scale: 1, opacity: 1 }}
             className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg border border-stone-200 mb-6"
           >
-            <div className="flex gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              ))}
-            </div>
+            <RatingStars rating={stats.rating} size={16} />
             <span className="text-sm font-bold text-stone-900">{stats.rating} / 5.0</span>
             <span className="text-stone-300">|</span>
             <span className="text-xs font-bold text-brand-600 uppercase">{stats.total}+ Google Reviews</span>
@@ -563,11 +547,7 @@ const Reviews = () => {
                     <p className="text-xs text-stone-400 italic">{review.date}</p>
                   </div>
                 </div>
-                <div className="flex gap-0.5 mb-4">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
+                <RatingStars rating={review.rating} size={12} />
                 <p className="text-stone-600 text-sm italic leading-relaxed h-[80px] line-clamp-4">
                   "{review.comment}"
                 </p>
@@ -595,7 +575,7 @@ const Reviews = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-stone-800 font-bold hover:text-brand-600 transition-colors py-2 border-b-2 border-brand-200"
           >
-            View all 520+ reviews on Google <ExternalLink className="w-4 h-4" />
+            View all {stats.total}+ reviews on Google <ExternalLink className="w-4 h-4" />
           </a>
         </div>
       </div>
@@ -696,37 +676,55 @@ const Contact = () => {
         <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-3">Find Us</h2>
         <h3 className="text-4xl md:text-5xl font-bold text-stone-900 mb-10 tracking-tight">Visit the <span className="italic font-serif text-brand-700">Salon</span></h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center max-w-5xl mx-auto pb-12 border-b border-stone-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-center max-w-3xl mx-auto pb-12 border-b border-stone-200">
           <div className="flex flex-col items-center">
-            <div className="w-14 h-14 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-center mb-6">
-              <MapPin className="text-brand-600 w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-lg text-stone-900 mb-2">Location</h4>
-            <p className="text-stone-500 text-sm leading-relaxed">1201 Winter Garden Vineland Rd,<br />Winter Garden, FL 34787</p>
+            <a 
+              href="https://www.google.com/maps/search/?api=1&query=Neeta%27s+Eyebrow+Threading+1201+Winter+Garden+Vineland+Rd+Winter+Garden+FL+34787"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col items-center"
+            >
+              <div className="w-14 h-14 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-50 group-hover:border-brand-300 transition-colors duration-300">
+                <MapPin className="text-brand-600 w-6 h-6" />
+              </div>
+              <h4 className="font-bold text-lg text-stone-900 mb-2 group-hover:text-brand-700 transition-colors duration-200">Location</h4>
+              <p className="text-stone-500 text-sm leading-relaxed group-hover:text-brand-600 transition-colors duration-200">
+                1201 Winter Garden Vineland Rd,<br />Winter Garden, FL 34787
+              </p>
+            </a>
           </div>
           
           <div className="flex flex-col items-center">
-            <div className="w-14 h-14 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-center mb-6">
-              <Phone className="text-brand-600 w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-lg text-stone-900 mb-2">Phone</h4>
-            <p className="text-stone-500 text-sm leading-relaxed">(555) 123-4567</p>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <div className="w-14 h-14 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-center mb-6">
-              <Mail className="text-brand-600 w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-lg text-stone-900 mb-2">Email</h4>
-            <p className="text-stone-500 text-sm leading-relaxed">hello@neetasbeauty.com</p>
+            <a 
+              href="tel:4076148138"
+              className="group flex flex-col items-center"
+            >
+              <div className="w-14 h-14 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-50 group-hover:border-brand-300 transition-colors duration-300">
+                <Phone className="text-brand-600 w-6 h-6" />
+              </div>
+              <h4 className="font-bold text-lg text-stone-900 mb-2 group-hover:text-brand-700 transition-colors duration-200">Phone</h4>
+              <p className="text-stone-500 text-sm leading-relaxed group-hover:text-brand-600 transition-colors duration-200">
+                (407) 614-8138
+              </p>
+            </a>
           </div>
         </div>
 
         <div className="pt-12 flex justify-center gap-4">
-          <a href="#" className="w-12 h-12 bg-brand-600 text-white rounded-xl flex items-center justify-center hover:bg-brand-700 transition-colors shadow-sm">
+          <a 
+            href="https://www.instagram.com/neetaseyebrowthreading/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-12 h-12 bg-brand-600 text-white rounded-xl flex items-center justify-center hover:bg-brand-700 transition-colors shadow-sm"
+          >
             <Instagram className="w-5 h-5" />
           </a>
-          <a href="#" className="w-12 h-12 bg-brand-600 text-white rounded-xl flex items-center justify-center hover:bg-brand-700 transition-colors shadow-sm">
+          <a 
+            href="https://www.facebook.com/neetaseyebrowthreading/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-12 h-12 bg-brand-600 text-white rounded-xl flex items-center justify-center hover:bg-brand-700 transition-colors shadow-sm"
+          >
             <Facebook className="w-5 h-5" />
           </a>
         </div>
@@ -794,15 +792,44 @@ const Footer = () => {
 };
 
 function HomePage() {
+  const [stats, setStats] = useState({ rating: 4.8, total: 724 });
+  const [liveReviews, setLiveReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch('/api/reviews');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.reviews && data.reviews.length > 0) {
+            setLiveReviews(data.reviews);
+          }
+          if (data.rating || data.totalReviews) {
+            setStats({ 
+              rating: data.rating || 4.8, 
+              total: data.totalReviews || 724 
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, []);
+
   return (
     <>
       <Navbar />
-      <Hero />
+      <Hero stats={stats} />
       <Services />
       <BookingBanner />
       <Aftercare />
       <FAQ />
-      <Reviews />
+      <Reviews stats={stats} liveReviews={liveReviews} loading={loading} />
       <Contact />
       <Footer />
     </>
