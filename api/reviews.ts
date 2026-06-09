@@ -1,22 +1,15 @@
-import express from 'express';
+import { IncomingMessage, ServerResponse } from 'http';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
-import dotenv from 'dotenv';
+import os from 'os';
 import fs from 'fs-extra';
 import axios from 'axios';
-import os from 'os';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-const app = express();
-const PORT = 3000;
-
-app.use(express.json());
-
 const CACHE_FILE = path.join(os.tmpdir(), 'reviews-cache.json');
-const DEFAULT_PLACE_ID = 'ChIJSU5hTsCD54gRE0VjjSqcjxU';
+const DEFAULT_PLACE_ID = 'ChIJSU5hTsCD54gRE0VjjSqcjxU'; // Use their actual place id here too
 
-// Ultimate high-quality real backup reviews to display if live API keys are not ready yet
 const FALLBACK_REVIEWS = [
   {
     id: 'r1',
@@ -46,7 +39,7 @@ const FALLBACK_REVIEWS = [
     id: 'r4',
     author: 'Emily Rodriguez',
     rating: 5,
-    comment: "First time getting a lash lift and brow lamination here and I am obsessed. Neeta did an incredible job and explained all the aftercare so thoroughly. Highly recommend!",
+    comment: "First time getting a lash lift and brow lamination here and I am obsessed. Neeta did an impressive job and explained all the aftercare so thoroughly. Highly recommend!",
     date: '1 week ago',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   },
@@ -60,12 +53,34 @@ const FALLBACK_REVIEWS = [
   }
 ];
 
-// Endpoint for fetching cached daily 5-star reviews
-app.get('/api/reviews', async (req, res) => {
+// Helper to write JSON responses
+function sendJSON(res: ServerResponse, status: number, data: any) {
+  res.writeHead(status, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+  });
+  res.end(JSON.stringify(data));
+}
+
+export default async function handler(req: IncomingMessage, res: ServerResponse) {
+  // Handle OPTIONS preflight requests for CORS
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+    });
+    res.end();
+    return;
+  }
+
   try {
+    const urlObj = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+    const forceRefresh = urlObj.searchParams.get('refresh') === 'true';
+    
     let cachedData: any = null;
     let useCache = false;
-    const forceRefresh = req.query.refresh === 'true';
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const placeId = process.env.GOOGLE_PLACE_ID || DEFAULT_PLACE_ID;
 
@@ -77,7 +92,6 @@ app.get('/api/reviews', async (req, res) => {
           const oneDayMs = 24 * 60 * 60 * 1000;
           
           if (ageMs < oneDayMs) {
-            // Only use cache if it wasn't a fallback, or if we STILL don't have an API key anyway
             const wasFallback = cachedData.isFallback === true;
             if (!apiKey || !wasFallback) {
               useCache = true;
@@ -90,7 +104,7 @@ app.get('/api/reviews', async (req, res) => {
     }
 
     if (useCache && cachedData) {
-      return res.json({
+      return sendJSON(res, 200, {
         rating: cachedData.rating || 4.9,
         totalReviews: cachedData.totalReviews || 850,
         reviews: cachedData.reviews || FALLBACK_REVIEWS
@@ -106,7 +120,7 @@ app.get('/api/reviews', async (req, res) => {
         isFallback: true
       };
       await fs.writeJson(CACHE_FILE, cacheObj, { spaces: 2 });
-      return res.json({ rating: 4.9, totalReviews: 850, reviews: FALLBACK_REVIEWS });
+      return sendJSON(res, 200, { rating: 4.9, totalReviews: 850, reviews: FALLBACK_REVIEWS });
     }
 
     let liveRating = 4.9;
@@ -116,7 +130,7 @@ app.get('/api/reviews', async (req, res) => {
 
     // 1. Try Classic Place Details API with reviews_sort=newest to fetch most recent reviews
     try {
-      console.log(`Fetching from Classic Google Place Details API for place ID: ${placeId}...`);
+      console.log(`[Serverless] Fetching from Classic Google Place Details API for place ID: ${placeId}...`);
       const classicUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&reviews_sort=newest&key=${apiKey}`;
       const classicResponse = await axios.get(classicUrl, { timeout: 10000 });
       const classicData = classicResponse.data;
@@ -137,18 +151,18 @@ app.get('/api/reviews', async (req, res) => {
           timestamp: r.time * 1000 || 0
         }));
         fetchedSuccessfully = true;
-        console.log(`Successfully fetched ${rawReviews.length} reviews from Classic Places API.`);
+        console.log(`[Serverless] Successfully fetched ${rawReviews.length} reviews from Classic Places API.`);
       } else {
-        console.warn('Classic Place Details API returned status:', classicData.status, classicData.error_message || '');
+        console.warn('[Serverless] Classic Place Details API returned status:', classicData.status, classicData.error_message || '');
       }
     } catch (classicErr: any) {
-      console.error('Error fetching from Classic Place Details API:', classicErr.message || classicErr);
+      console.error('[Serverless] Error fetching from Classic Place Details API:', classicErr.message || classicErr);
     }
 
     // 2. Fall back to New Places API v1 if Classic didn't succeed
     if (!fetchedSuccessfully) {
       try {
-        console.log(`Falling back to New Places API v1 for place ID: ${placeId}...`);
+        console.log(`[Serverless] Falling back to New Places API v1 for place ID: ${placeId}...`);
         const response = await axios.get(`https://places.googleapis.com/v1/places/${placeId}`, {
           headers: {
             'X-Goog-Api-Key': apiKey,
@@ -172,13 +186,13 @@ app.get('/api/reviews', async (req, res) => {
           timestamp: r.publishTime ? new Date(r.publishTime).getTime() : 0
         }));
         fetchedSuccessfully = true;
-        console.log(`Successfully fetched ${rawReviews.length} reviews from New Places API.`);
+        console.log(`[Serverless] Successfully fetched ${rawReviews.length} reviews from New Places API.`);
       } catch (v1Err: any) {
-        console.error('Error fetching from New Places API v1:', v1Err.message || v1Err);
+        console.error('[Serverless] Error fetching from New Places API v1:', v1Err.message || v1Err);
       }
     }
 
-    // Sort raw reviews by timestamp descending to ensure the absolute most recent ones are evaluated first
+    // Sort raw reviews by timestamp descending
     const sortedRawReviews = [...rawReviews].sort((a: any, b: any) => b.timestamp - a.timestamp);
 
     // Filter to get only 5-star rating reviews
@@ -212,7 +226,6 @@ app.get('/api/reviews', async (req, res) => {
       }
     }
 
-    // Limit strictly to up to 5 reviews
     processedReviews = processedReviews.slice(0, 5);
 
     const cacheObj = {
@@ -223,64 +236,24 @@ app.get('/api/reviews', async (req, res) => {
       isFallback: !fetchedSuccessfully
     };
 
-    await fs.writeJson(CACHE_FILE, cacheObj, { spaces: 2 });
+    try {
+      await fs.writeJson(CACHE_FILE, cacheObj, { spaces: 2 });
+    } catch (writeErr) {
+      console.warn('[Serverless] Could not write cache file:', writeErr);
+    }
 
-    return res.json({
+    return sendJSON(res, 200, {
       rating: liveRating,
       totalReviews: liveTotal,
       reviews: processedReviews
     });
-
-  } catch (apiErr: any) {
-    console.error('Error fetching from Google Places API:', apiErr.message || apiErr);
-    
-    // Graceful expired cache read
-    if (await fs.pathExists(CACHE_FILE)) {
-      try {
-        const expiredCache = await fs.readJson(CACHE_FILE);
-        if (expiredCache && expiredCache.reviews) {
-          return res.json({
-            rating: expiredCache.rating || 4.9,
-            totalReviews: expiredCache.totalReviews || 850,
-            reviews: expiredCache.reviews
-          });
-        }
-      } catch (readErr) {
-        // ignore
-      }
-    }
-
-    return res.json({
+  } catch (err: any) {
+    console.error('[Serverless] Function Error:', err.message || err);
+    return sendJSON(res, 500, {
       rating: 4.9,
       totalReviews: 850,
-      reviews: FALLBACK_REVIEWS
+      reviews: FALLBACK_REVIEWS,
+      error: err.message || 'Internal Server Error'
     });
   }
-});
-
-// A simple health check API
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: "Neeta's Eyebrow Threading active" });
-});
-
-async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
 }
-
-startServer();
