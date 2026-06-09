@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   BrowserRouter as Router,
   Routes,
@@ -29,7 +29,16 @@ import {
   Eye,
   Wand2,
   Flame,
-  ChevronRight
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  Search,
+  Check,
+  Send,
+  ThumbsUp,
+  Filter,
+  MessageSquare,
+  Award
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ALL_SERVICES } from './constants';
@@ -37,6 +46,7 @@ import ServicesPage from './pages/ServicesPage';
 import AftercarePage from './pages/AftercarePage';
 import { FAQS, AFTERCARE_GUIDES } from './data/careData';
 import { RatingStars } from './components/RatingStars';
+import { getRelativeDateString } from './utils/date';
 
 // Types
 interface Service {
@@ -54,6 +64,7 @@ interface Review {
   comment: string;
   date: string;
   avatar: string;
+  timestamp?: number;
 }
 
 // Components
@@ -275,6 +286,15 @@ const SHOWCASE_CATEGORIES = [
     colorClass: "text-sky-700 bg-sky-50 border-sky-200"
   },
   {
+    name: "Permanent Makeup",
+    description: "Premium cosmetic shading, soft ombre powder brows, or advanced nano hair stroke combos for flawless beauty.",
+    highlights: ["Soft Ombre Shaded Brows", "Defined Powder Makeup Looks", "Prestige Nano Combo Strokes"],
+    startingPrice: "From $350",
+    linkHash: "Permanent Makeup",
+    icon: Wand2,
+    colorClass: "text-amber-800 bg-amber-50 border-amber-200"
+  },
+  {
     name: "Eyelash Extension",
     description: "Classic lashes, gorgeous strips, or temporary fillers compiled to elevate your lash volume instantly.",
     highlights: ["Eyelash Extensions Set", "Temporary Strip Application", "Quick 10m Lash Touch-Ups"],
@@ -396,188 +416,186 @@ const Aftercare = () => {
   );
 };
 
-const REVIEWS: Review[] = [
-    {
-      id: 'r1',
-      author: 'Sarah Jenkins',
-      rating: 5,
-      comment: "Neeta is a true artist! I've been getting my eyebrows threaded for years and I've never found anyone as precise and gentle as her. The salon is beautiful and so calming.",
-      date: '2 weeks ago',
-      avatar: 'https://i.pravatar.cc/150?u=sarah'
-    },
-    {
-      id: 'r2',
-      author: 'Michael Chen',
-      rating: 5,
-      comment: "Great experience every time. The atmosphere is professional yet welcoming. My skin has never looked better after the facial treatments here. Highly recommended!",
-      date: '1 month ago',
-      avatar: 'https://i.pravatar.cc/150?u=michael'
-    },
-    {
-      id: 'r3',
-      author: 'Aria Thompson',
-      rating: 5,
-      comment: "The only place I trust with my brows! Neeta takes her time and really listens to what you want. The mapping technique she uses is second to none.",
-      date: '3 weeks ago',
-      avatar: 'https://i.pravatar.cc/150?u=aria'
-    },
-    {
-      id: 'r4',
-      author: 'Jessica Miller',
-      rating: 5,
-      comment: "Super professional and the results are always consistent. I drive 30 minutes just to see Neeta because nobody else gets my shape quite right.",
-      date: '1 week ago',
-      avatar: 'https://i.pravatar.cc/150?u=jess'
-    },
-    {
-      id: 'r5',
-      author: 'David Wilson',
-      rating: 5,
-      comment: "Brought my daughter here for her first brow threading. Neeta was so patient and explained everything. She's now a customer for life!",
-      date: '2 months ago',
-      avatar: 'https://i.pravatar.cc/150?u=david'
-    },
-    {
-      id: 'r6',
-      author: 'Linda Garcia',
-      rating: 5,
-      comment: "The facial treatments are pure bliss. I feel like a new person after every visit. The attention to detail is truly remarkable.",
-      date: '5 days ago',
-      avatar: 'https://i.pravatar.cc/150?u=linda'
-    }
-  ];
+const Reviews = () => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [rating, setRating] = useState(4.9);
+  const [totalReviews, setTotalReviews] = useState(850);
+  const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-const Reviews = ({ 
-  stats, 
-  liveReviews, 
-  loading 
-}: { 
-  stats: { rating: number; total: number }; 
-  liveReviews: Review[]; 
-  loading: boolean;
-}) => {
-  const [showAll, setShowAll] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let active = true;
+    const fetchReviewsData = async () => {
+      try {
+        const res = await fetch(`/api/reviews?t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (active) {
+            setReviews(data.reviews || []);
+            setRating(data.rating || 4.9);
+            setTotalReviews(data.totalReviews || 850);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load reviews from API:', err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchReviewsData();
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  const reviewsToDisplay = liveReviews.length > 0 ? liveReviews : REVIEWS;
-  const initialReviewsCount = reviewsToDisplay.length;
-  // Duplicate reviews 4 times for a very long strip to ensure seamlessness
-  const tripleReviews = [...reviewsToDisplay, ...reviewsToDisplay, ...reviewsToDisplay, ...reviewsToDisplay];
-
-  // Logic for seamless infinite scroll
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    
-    // One set of reviews width (approximate)
-    const singleSetWidth = scrollWidth / 4;
-
-    // If near the end (into the 4th set), jump back to the 2nd set
-    if (scrollLeft + clientWidth >= scrollWidth - 100) {
-      scrollRef.current.scrollLeft = singleSetWidth;
-    }
-    // If near the beginning (into the 1st set), jump forward to the 3rd set
-    else if (scrollLeft <= 100) {
-      scrollRef.current.scrollLeft = singleSetWidth * 2;
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -340, behavior: 'smooth' });
     }
   };
 
-  // Initial scroll position to the middle
-  useEffect(() => {
-    if (scrollRef.current) {
-      const singleSetWidth = scrollRef.current.scrollWidth / 4;
-      scrollRef.current.scrollLeft = singleSetWidth;
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' });
     }
-  }, [liveReviews, showAll]);
+  };
 
   return (
-    <section id="reviews" className="py-16 bg-stone-100/30 relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-100 rounded-full blur-3xl opacity-30"></div>
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-stone-200 rounded-full blur-3xl opacity-30"></div>
-
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-10">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg border border-stone-200 mb-6"
-          >
-            <RatingStars rating={stats.rating} size={16} />
-            <span className="text-sm font-bold text-stone-900">{stats.rating} / 5.0</span>
-            <span className="text-stone-300">|</span>
-            <span className="text-xs font-bold text-brand-600 uppercase">{stats.total}+ Google Reviews</span>
-          </motion.div>
+    <section id="reviews" className="py-20 bg-stone-50 relative overflow-hidden">
+      {/* Decorative Blur Background Elements */}
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-brand-100 rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
+      
+      <div className="max-w-7xl mx-auto px-6 relative">
+        
+        {/* Simple & Clean Header */}
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 bg-stone-900 text-white px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest shadow-md mb-4">
+            <CheckCircle2 className="w-3.5 h-3.5 text-brand-400" />
+            <span>Verified Google Reviews</span>
+          </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 tracking-tight">Loved by Our Community</h2>
-          <p className="text-stone-500 max-w-xl mx-auto">
-            Real reviews from our Google Business profile, featuring only our 5-star experiences.
-          </p>
-        </div>
-
-        <div className="relative group">
-          {/* Subtle scroll indicators for indications */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-stone-100/80 to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-stone-100/80 to-transparent z-10 pointer-events-none"></div>
-
-          {/* Marquee Container */}
-          <div 
-            className="flex overflow-x-auto no-scrollbar gap-6 pb-12 snap-x snap-mandatory px-4 -mx-4 scroll-smooth"
-            ref={scrollRef}
-            onScroll={handleScroll}
-          >
-            {tripleReviews.map((review, index) => (
-              <motion.div 
-                key={`${review.id}-${index}`} 
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: (index % initialReviewsCount) * 0.05 }}
-                className="flex-shrink-0 w-[75vw] md:w-[400px] bg-white p-8 rounded-[2.5rem] shadow-lg border border-stone-200 snap-center hover:shadow-2xl transition-all duration-500"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="relative">
-                    <img src={review.avatar || 'https://i.pravatar.cc/150'} alt={review.author} className="w-14 h-14 rounded-2xl object-cover border border-stone-200 shadow-sm" />
-                    <div className="absolute -bottom-1 -right-1 bg-brand-500 text-white p-1 rounded-lg shadow-sm">
-                      <CheckCircle2 className="w-3 h-3" />
-                    </div>
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-stone-900">{review.author}</h5>
-                    <p className="text-xs text-stone-400 italic">{review.date}</p>
-                  </div>
-                </div>
-                <RatingStars rating={review.rating} size={12} />
-                <p className="text-stone-600 text-sm italic leading-relaxed h-[80px] line-clamp-4">
-                  "{review.comment}"
-                </p>
-                <div className="mt-6 flex items-center gap-2 text-[10px] font-bold text-brand-600 uppercase tracking-widest pt-4 border-t border-stone-50">
-                  Verified Google Review
-                </div>
-              </motion.div>
-            ))}
+          <h2 className="text-3xl md:text-5xl font-medium text-stone-900 mb-4 tracking-tight leading-tight">
+            Loved by Our <span className="font-serif italic text-brand-700">Community</span>
+          </h2>
+          
+          <div className="flex items-center justify-center gap-2.5 mt-2">
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-stone-800 text-lg">{rating.toFixed(1)}</span>
+              <RatingStars rating={rating} size={15} />
+            </div>
+            <span className="text-stone-300">|</span>
+            <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">{totalReviews}+ Google Reviews</span>
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col items-center gap-6">
-          {!showAll && reviewsToDisplay.length > 3 && (
+        {loading ? (
+          <div className="py-20 flex justify-center items-center">
+            <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="relative group">
+            {/* Scroll Control Buttons (Visible on desktop/hover) */}
             <button 
-              onClick={() => setShowAll(true)}
-              className="bg-brand-100 text-brand-700 px-8 py-3 rounded-2xl font-bold hover:bg-brand-200 transition-colors flex items-center gap-2 group"
+              onClick={scrollLeft}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-11 bg-white hover:bg-brand-50 text-stone-800 w-12 h-12 rounded-full border border-stone-200 shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 md:flex hidden hover:scale-105 active:scale-95"
+              aria-label="Previous Review"
             >
-              Load More Reviews <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+              <ChevronLeft className="w-6 h-6 text-stone-700" />
             </button>
-          )}
-          
-          <a 
-            href="https://www.google.com/search?q=Neeta%27s+Eyebrow+Threading+and+Beauty+Salon+reviews" 
-            target="_blank" 
+            <button 
+              onClick={scrollRight}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-11 bg-white hover:bg-brand-50 text-stone-800 w-12 h-12 rounded-full border border-stone-200 shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 md:flex hidden hover:scale-105 active:scale-95"
+              aria-label="Next Review"
+            >
+              <ChevronRight className="w-6 h-6 text-stone-700" />
+            </button>
+
+            {/* Horizontal Scroll Swiper List */}
+            <div 
+              ref={scrollContainerRef}
+              className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 px-4 -mx-4 no-scrollbar scroll-smooth cursor-grab active:cursor-grabbing"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {reviews.map((review) => (
+                <div 
+                  key={review.id}
+                  className="flex-shrink-0 w-[290px] sm:w-[340px] md:w-[380px] bg-white p-8 rounded-3xl border border-stone-200/80 shadow-md snap-center flex flex-col justify-between hover:shadow-xl hover:border-brand-100/40 transition-all duration-300"
+                >
+                  <div className="flex flex-col h-full justify-between">
+                    <div>
+                      {/* Header line */}
+                      <div className="flex items-center gap-3.5 mb-4">
+                        <img 
+                          src={review.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'} 
+                          alt={review.author} 
+                          className="w-11 h-11 rounded-full object-cover border border-stone-100 shadow-sm flex-shrink-0" 
+                          referrerPolicy="no-referrer"
+                        />
+                        <div>
+                          <h4 className="font-bold text-sm text-stone-900 leading-tight">
+                            {review.author}
+                          </h4>
+                          <p className="text-[10px] text-stone-400 mt-0.5">
+                            {getRelativeDateString(review.timestamp, review.date)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Stars */}
+                      <div className="mb-4">
+                        <RatingStars rating={review.rating} size={11} />
+                      </div>
+
+                      {/* Verified Review Text */}
+                      <p className="text-stone-600 text-xs sm:text-sm leading-relaxed italic line-clamp-5">
+                        "{review.comment}"
+                      </p>
+                    </div>
+
+                    {/* Foot Line */}
+                    <div className="mt-6 pt-4 border-t border-stone-100/80 flex items-center justify-between text-[10px] font-bold text-brand-600 uppercase tracking-wider">
+                      <span className="flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-500 fill-brand-100" />
+                        Verified 5-Star Visit
+                      </span>
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" 
+                        alt="Google" 
+                        className="w-3.5 h-3.5 opacity-90"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Swiper Hint Indicators */}
+            <div className="flex justify-center gap-1.5 mt-2">
+              {reviews.map((_, i) => (
+                <div 
+                  key={i} 
+                  className="w-1.5 h-1.5 rounded-full bg-stone-300"
+                />
+              ))}
+            </div>
+
+          </div>
+        )}
+
+        {/* View all button */}
+        <div className="text-center mt-12 pt-6 border-t border-stone-200/50">
+          <a
+            href="https://www.google.com/search?q=Neeta%27s+Eyebrow+Threading+and+Beauty+Salon+reviews"
+            target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-stone-800 font-bold hover:text-brand-600 transition-colors py-2 border-b-2 border-brand-200"
+            className="inline-flex items-center gap-2 text-stone-800 font-bold hover:text-brand-600 transition-all py-1.5 border-b-2 border-brand-200 hover:border-brand-500 text-xs sm:text-sm"
           >
-            View all {stats.total}+ reviews on Google <ExternalLink className="w-4 h-4" />
+            Read all {totalReviews}+ reviews on Google <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
+
       </div>
     </section>
   );
@@ -735,55 +753,146 @@ const Contact = () => {
 
 const Footer = () => {
   return (
-    <footer className="bg-stone-900 text-white py-16">
+    <footer className="bg-stone-950 text-white pt-20 pb-12 border-t border-stone-900">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center">
-                <Sparkles className="text-white w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+          {/* Logo & Bio Column */}
+          <div className="col-span-1 md:col-span-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-900/20">
+                  <Sparkles className="text-white w-5 h-5" />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">
+                  Neeta's <span className="text-brand-400 font-normal">Eyebrow Threading</span>
+                </span>
               </div>
-              <span className="text-2xl font-bold tracking-tight">Neeta's <span className="text-brand-400">Eyebrow Threading</span></span>
+              <p className="text-stone-400 text-sm max-w-md mb-8 leading-relaxed font-medium">
+                Sleek contours, timeless precision, and luxurious beauty care. We specialize in threading, tinting, and advanced beauty curation designed to elevate your aesthetic with clinical hygiene and meticulous craft.
+              </p>
             </div>
-            <p className="text-stone-400 max-w-sm mb-6 leading-relaxed">
-              We specialize in the timeless art of threading and holistic beauty 
-              treatments designed to enhance your natural features without compromise.
-            </p>
-            <div className="text-sm text-stone-500 font-mono">
-              ESTABLISHED 2012 / WINTER GARDEN, FL
+            
+            <div className="space-y-4">
+              <div className="text-xs text-stone-500 tracking-wider font-mono uppercase">
+                ESTABLISHED 2012 &bull; WINTER GARDEN, FL
+              </div>
+              <div className="flex gap-3">
+                <a 
+                  href="https://www.instagram.com/neetaseyebrowthreading/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-9 h-9 border border-stone-800 text-stone-400 rounded-xl flex items-center justify-center hover:bg-brand-600 hover:text-white hover:border-brand-600 transition-all duration-300 hover:-translate-y-0.5"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://www.facebook.com/neetaseyebrowthreading/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-9 h-9 border border-stone-800 text-stone-400 rounded-xl flex items-center justify-center hover:bg-brand-600 hover:text-white hover:border-brand-600 transition-all duration-300 hover:-translate-y-0.5"
+                  aria-label="Facebook"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
           
-          <div>
-            <h4 className="font-bold text-lg mb-6">Explore</h4>
-            <ul className="space-y-4 text-stone-400">
-              <li><a href="#" className="hover:text-brand-400 transition-colors">Home</a></li>
-              <li><a href="#services" className="hover:text-brand-400 transition-colors">Services</a></li>
-              <li><a href="#reviews" className="hover:text-brand-400 transition-colors">Reviews</a></li>
-              <li><a href="#aftercare" className="hover:text-brand-400 transition-colors">Aftercare</a></li>
-              <li><a href="#faq" className="hover:text-brand-400 transition-colors">FAQ</a></li>
-              <li><a href="#contact" className="hover:text-brand-400 transition-colors">Contact</a></li>
+          {/* Contact Details Column */}
+          <div className="col-span-1 md:col-span-3">
+            <h4 className="text-xs font-black uppercase tracking-widest text-brand-400 mb-6 font-mono">Salon Location</h4>
+            <div className="space-y-5 text-sm">
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=Neeta%27s+Eyebrow+Threading+1201+Winter+Garden+Vineland+Rd+Winter+Garden+FL+34787"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex gap-3 text-stone-400 hover:text-white transition-colors"
+              >
+                <MapPin className="text-brand-500 w-4 h-4 shrink-0 mt-0.5" />
+                <span className="leading-relaxed text-stone-300 font-medium">
+                  1201 Winter Garden Vineland Rd,<br />
+                  Winter Garden, FL 34787
+                </span>
+              </a>
+              <a 
+                href="tel:4076148138"
+                className="group flex gap-3 text-stone-400 hover:text-white transition-colors items-center"
+              >
+                <Phone className="text-brand-500 w-4 h-4 shrink-0" />
+                <span className="text-stone-300 font-medium">(407) 614-8138</span>
+              </a>
+              <div className="p-3.5 bg-stone-900/50 border border-stone-800/80 rounded-2xl max-w-[240px] text-center mt-2 animate-pulse-slow">
+                <span className="text-[10px] font-extrabold tracking-widest uppercase text-brand-400 block mb-1 font-mono">Service Policy</span>
+                <span className="text-[11px] text-stone-400 font-medium leading-normal block">Walk-ins Welcome &bull; Appointments Recommended</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Explore Column */}
+          <div className="col-span-1 md:col-span-2">
+            <h4 className="text-xs font-black uppercase tracking-widest text-brand-400 mb-6 font-mono">Explore</h4>
+            <ul className="space-y-3.5 text-sm font-medium text-stone-400">
+              <li>
+                <a href="#" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="#services" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">
+                  Services
+                </a>
+              </li>
+              <li>
+                <a href="#aftercare" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">
+                  Aftercare Guides
+                </a>
+              </li>
+              <li>
+                <a href="#reviews" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">
+                  Client Reviews
+                </a>
+              </li>
+              <li>
+                <a href="#faq" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">
+                  Frequently Asked
+                </a>
+              </li>
             </ul>
           </div>
           
-          <div>
-            <h4 className="font-bold text-lg mb-6">Salon Hours</h4>
-            <ul className="space-y-4 text-stone-400 text-sm">
-              <li className="flex justify-between"><span>Mon - Wed</span> <span>10am - 6pm</span></li>
-              <li className="flex justify-between"><span>Thu - Fri</span> <span>10am - 7pm</span></li>
-              <li className="flex justify-between"><span>Saturday</span> <span>10pm - 5am</span></li>
-              <li className="flex justify-between"><span>Sunday</span> <span className="text-stone-500 font-bold uppercase tracking-wider">Closed</span></li>
+          {/* Salon Hours Column */}
+          <div className="col-span-1 md:col-span-2">
+            <h4 className="text-xs font-black uppercase tracking-widest text-brand-400 mb-6 font-mono">Salon Hours</h4>
+            <ul className="space-y-3 text-xs font-medium text-stone-300 font-mono">
+              <li className="flex justify-between pb-2 border-b border-stone-900/80">
+                <span className="text-stone-400">Mon - Wed</span>
+                <span>10am - 6pm</span>
+              </li>
+              <li className="flex justify-between pb-2 border-b border-stone-900/80">
+                <span className="text-stone-400">Thu - Fri</span>
+                <span>10am - 7pm</span>
+              </li>
+              <li className="flex justify-between pb-2 border-b border-stone-900/80">
+                <span className="text-stone-400">Saturday</span>
+                <span>10am - 5pm</span>
+              </li>
+              <li className="flex justify-between pb-1">
+                <span className="text-stone-400">Sunday</span>
+                <span className="text-brand-400 uppercase tracking-widest font-extrabold text-[10px]">Closed</span>
+              </li>
             </ul>
           </div>
         </div>
         
-        <div className="pt-12 border-t border-stone-800 flex flex-col md:flex-row justify-between items-center gap-6">
+        {/* Fine Print Bottom Bar */}
+        <div className="pt-8 border-t border-stone-900 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-stone-500 text-xs font-medium">
             &copy; {new Date().getFullYear()} Neeta's Eyebrow Threading. All rights reserved.
           </p>
-          <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-stone-500">
-            <a href="#" className="hover:text-brand-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-brand-400 transition-colors">Terms of Service</a>
+          <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest text-stone-500">
+            <a href="#" className="hover:text-brand-400 hover:underline transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-brand-400 hover:underline transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>
@@ -792,34 +901,7 @@ const Footer = () => {
 };
 
 function HomePage() {
-  const [stats, setStats] = useState({ rating: 4.8, total: 724 });
-  const [liveReviews, setLiveReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch('/api/reviews');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.reviews && data.reviews.length > 0) {
-            setLiveReviews(data.reviews);
-          }
-          if (data.rating || data.totalReviews) {
-            setStats({ 
-              rating: data.rating || 4.8, 
-              total: data.totalReviews || 724 
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReviews();
-  }, []);
+  const stats = { rating: 4.9, total: 850 };
 
   return (
     <>
@@ -829,7 +911,7 @@ function HomePage() {
       <BookingBanner />
       <Aftercare />
       <FAQ />
-      <Reviews stats={stats} liveReviews={liveReviews} loading={loading} />
+      <Reviews />
       <Contact />
       <Footer />
     </>

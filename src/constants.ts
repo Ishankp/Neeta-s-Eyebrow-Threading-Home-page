@@ -10,13 +10,14 @@ export interface Service {
   price: string;
   length?: string;
   image: string;
-  category: "Threading or Waxing" | "Tinting" | "Deal Price" | "Eyelash Extension" | "Facials" | "Lamination and Lift" | "Body Wax";
+  category: "Threading or Waxing" | "Tinting" | "Deal Price" | "Permanent Makeup" | "Eyelash Extension" | "Facials" | "Lamination and Lift" | "Body Wax";
 }
 
 export type Category = 
   | "Threading or Waxing"
   | "Tinting"
   | "Deal Price"
+  | "Permanent Makeup"
   | "Eyelash Extension"
   | "Facials"
   | "Lamination and Lift"
@@ -26,6 +27,7 @@ export const CATEGORIES: Category[] = [
   "Threading or Waxing",
   "Tinting",
   "Deal Price",
+  "Permanent Makeup",
   "Eyelash Extension",
   "Facials",
   "Lamination and Lift",
@@ -217,6 +219,35 @@ export const ALL_SERVICES: Service[] = [
     length: '15 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Deal Price'
+  },
+
+  // Permanent Makeup
+  {
+    id: 'pm1',
+    name: 'Ombre',
+    description: 'A semi-permanent shading technique that creates a soft, misty, powder-filled brow look that fades lighter towards the front.',
+    price: '$350',
+    length: '120 min',
+    image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600',
+    category: 'Permanent Makeup'
+  },
+  {
+    id: 'pm2',
+    name: 'Powder',
+    description: 'A soft, powdered makeup look with a solid, defined shape—perfect for those who prefer a fuller, more filled-in appearance.',
+    price: '$350',
+    length: '120 min',
+    image: 'https://images.unsplash.com/photo-1542385310-74e2dfda9c1b?auto=format&fit=crop&q=80&w=600',
+    category: 'Permanent Makeup'
+  },
+  {
+    id: 'pm3',
+    name: 'Nano combo',
+    description: 'A premium combination of ultra-realistic micro-nano hair strokes at the front with soft, powdered shading at the arches and tails.',
+    price: '$450',
+    length: '150 min',
+    image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600',
+    category: 'Permanent Makeup'
   },
 
   // Eyelash Extension

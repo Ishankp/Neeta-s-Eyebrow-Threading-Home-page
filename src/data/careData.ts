@@ -62,13 +62,18 @@ export const FAQS: FAQItemData[] = [
     question: "How should I prepare specifically for my first Body Waxing appointment?",
     answer: "To ensure your body waxing session is highly successful and comfortable, please verify that your hair is at least 1/4 inch long (about the size of a grain of rice). Gently exfoliate the target skin 24 to 48 hours prior to your visit. Avoid wearing heavy body oils or creams on the day of your appointment, and wear loose, comfortable clothing.",
     serviceIds: ["bw1", "bw2", "bw3", "bw4", "bw5", "bw6", "bw7", "bw8", "dp5"]
+  },
+  {
+    question: "What is Permanent Makeup, and how is it different from microblading?",
+    answer: "Permanent Makeup (PMU) techniques like Ombre and Powder brows use a delicate digital pen or specialized machine to disperse gentle cosmetic pigment into the uppermost dermis layer of the skin, resulting in a soft, shaded, misty powder pencil look that is beautiful and realistic. Nano combo blends hyper-realistic micro hair stroke channels at the front with soft shading at the arch and tails. Unlike traditional microblading, these advanced PMU methods are much gentler on the skin, last longer (typically 1-3 years), fade more uniformly, and are excellent for all skin types—including oily or sensitive skin.",
+    serviceIds: ["pm1", "pm2", "pm3"]
   }
 ];
 
 export const AFTERCARE_GUIDES: AftercareGuide[] = [
   {
     id: "tinting",
-    title: "Tinting after care",
+    title: "Tinting Aftercare",
     subtitle: "Eyebrow & Lash Tinting Post-Care",
     category: "Color Definition",
     description: "Lock in and protect the richness and depth of your semi-permanent lash or brow tint.",
@@ -111,7 +116,7 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
   },
   {
     id: "lamination",
-    title: "Eyelash lift and brow lamination care",
+    title: "Lash Lift & Brow Lamination Care",
     subtitle: "Eyebrow Lamination & Lash Lift Post-Care",
     category: "Brow & Lash Curation",
     description: "Refine and maintain that beautifully feathered brow alignment and upward natural lash curve.",
@@ -154,7 +159,7 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
   },
   {
     id: "waxing",
-    title: "Post-Waxing Care",
+    title: "Waxing & Skin Post-Care",
     subtitle: "Your Guide to Smooth & Healthy Skin",
     category: "Skin Care & Soothing",
     description: "We are thrilled you chose us for your waxing service today! We understand that having your skin waxed can feel like a big step, but rest assured, our professional techniques are designed with your safety and comfort as our top priority. Because your skin has just undergone a thorough exfoliation and hair removal process, it is currently in a delicate state. Following a consistent aftercare routine is the secret to preventing irritation, avoiding ingrown hairs, and ensuring your skin stays silky smooth for as long as possible.",
@@ -209,7 +214,7 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
   },
   {
     id: "eyelash_extension",
-    title: "Eyelash extension care",
+    title: "Eyelash Extension Care",
     subtitle: "Classic & Strip Eyelash Post-Care",
     category: "Lashes & Extensions",
     description: "Keep your gorgeous eyelash sets full, cleanly separated, and resilient to extend their lifespan.",
@@ -247,13 +252,13 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
   },
   {
     id: "microblading",
-    title: "Microblading After Care",
-    subtitle: "Semi-Permanent Eyebrow Post-Care",
+    title: "Permanent Makeup & Microblading Care",
+    subtitle: "Permanent Makeup & Microblading Brow Post-Care",
     category: "Semi-Permanent Brows",
-    description: "Congratulations on your microblading service! Following a consistent aftercare routine is the key to preventing irritation, ensuring clean pigment retention, and keeping your beautiful hyper-realistic strokes crisp for 1 to 2 years.",
+    description: "Congratulations on your permanent makeup/microblading brow service! Following a consistent aftercare routine is the key to preventing irritation, ensuring clean pigment retention, and keeping your beautiful shape crisp for 1 to 3 years.",
     criticalPhase: "First 14 days of active healing",
-    expectedResults: "Crisply healed, authentic pigment brow strokes lasting 1-2 years",
-    serviceIds: [],
+    expectedResults: "Healed, beautifully defined premium pigment brows lasting 1-3 years",
+    serviceIds: ["pm1", "pm2", "pm3"],
     timeline: [
       {
         time: "Day 1 - 14",

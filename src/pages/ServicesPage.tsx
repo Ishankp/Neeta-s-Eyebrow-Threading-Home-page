@@ -313,7 +313,7 @@ export default function ServicesPage() {
                       <FileText className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-stone-900 text-sm uppercase tracking-wider mb-1">Post-Care Guide</h4>
+                      <h4 className="font-bold text-stone-900 text-sm uppercase tracking-wider mb-1">{selectedService.details.postCare.title}</h4>
                       <p className="text-xs text-stone-600 leading-normal mb-3 font-medium">
                         Proper preparation and post-care ensures perfect long-term results.
                       </p>
@@ -343,19 +343,11 @@ export default function ServicesPage() {
                     </div>
                   </div>
                 )}
-                
-                {/* Visual context awareness disclaimer to address information overload question */}
-                <div className="pt-2 text-center">
-                  <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                    ✨ Selected Care Details &bull; Quick Reference ✨
-                  </p>
-                </div>
               </div>
 
               {/* Footer CTA */}
               <div className="p-6 border-t border-stone-100 bg-stone-50/50 flex items-center justify-between">
                 <div className="text-left">
-                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest block">Investment</span>
                   <span className="text-2xl font-black text-brand-600">{selectedService.price}</span>
                 </div>
                 <a
