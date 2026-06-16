@@ -8,7 +8,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link
+  Link,
+  useNavigate
 } from 'react-router-dom';
 import { 
   Instagram, 
@@ -315,6 +316,7 @@ const SHOWCASE_CATEGORIES = [
 ];
 
 const Services = () => {
+  const navigate = useNavigate();
   return (
     <section id="services" className="py-16 bg-stone-50/40 relative">
       <div className="max-w-7xl mx-auto px-6">
@@ -341,7 +343,8 @@ const Services = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
-                className="group bg-white p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-stone-150 hover:border-brand-200 transition-all shadow-sm hover:shadow-xl hover:shadow-brand-600/5 flex flex-col justify-between"
+                onClick={() => navigate(`/services#${category.linkHash}`)}
+                className="group bg-white p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-stone-150 hover:border-brand-200 transition-all shadow-sm hover:shadow-xl hover:shadow-brand-600/5 flex flex-col justify-between cursor-pointer"
               >
                 <div>
                   {/* Category Details */}
@@ -354,8 +357,7 @@ const Services = () => {
                 </div>
 
                 {/* Explore Action Link */}
-                <Link 
-                  to={`/services#${category.linkHash}`}
+                <div 
                   className="pt-3 md:pt-4 border-t border-stone-50 flex items-center justify-between text-brand-700 font-bold text-[11px] md:text-xs hover:text-brand-800 transition-colors group/link"
                 >
                   <span>
@@ -365,7 +367,7 @@ const Services = () => {
                   <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-stone-50 flex items-center justify-center border border-stone-200 group-hover/link:bg-brand-600 group-hover/link:text-white group-hover/link:border-brand-600 transition-all">
                     <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5" />
                   </div>
-                </Link>
+                </div>
               </motion.div>
             );
           })}

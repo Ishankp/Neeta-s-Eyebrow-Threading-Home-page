@@ -6,7 +6,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Sparkles, Clock, CheckCircle2, MoreHorizontal, X, FileText, HelpCircle, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ALL_SERVICES, Service, Category, CATEGORIES } from '../constants';
 import { getFaqsForService, getAftercareForService } from '../data/careData';
 
@@ -26,16 +26,40 @@ export default function ServicesPage() {
   const [activeCategory, setActiveCategory] = useState<Category | "">("");
   const [selectedService, setSelectedService] = useState<(Service & { details: ServiceDetail }) | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
-    if (window.location.hash) {
-      const hash = decodeURIComponent(window.location.hash.substring(1));
-      setTimeout(() => {
-        scrollToSection(hash);
-      }, 150);
+    if (location.hash) {
+      const hash = decodeURIComponent(location.hash.substring(1));
+      
+      // Attempt 1: Scroll after a very brief delay so the initial DOM is ready
+      const timer1 = setTimeout(() => {
+        scrollToSection(hash, false);
+      }, 100);
+
+      // Attempt 2: Correction scroll after layout/fonts/transition animations settle
+      const timer2 = setTimeout(() => {
+        scrollToSection(hash, false);
+      }, 450);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     } else {
       window.scrollTo(0, 0);
     }
+  }, [location]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Update active category on scroll
@@ -47,8 +71,9 @@ export default function ServicesPage() {
     };
 
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+      if (isScrollingRef.current) return;
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !isScrollingRef.current) {
           setActiveCategory(entry.target.id as Category);
         }
       });
@@ -86,19 +111,24 @@ export default function ServicesPage() {
     return acc;
   }, {} as Record<Category, Service[]>);
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string, isInstant = false) => {
     const element = document.getElementById(id);
     if (element) {
-      const offset = 140; // Account for both navbars
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      isScrollingRef.current = true;
+      setActiveCategory(id as Category);
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
+      // Natively scroll into view, respecting scroll-margin-top (scroll-mt-40)
+      element.scrollIntoView({
+        behavior: isInstant ? 'auto' : 'smooth',
+        block: 'start'
       });
+
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 1000);
     }
   };
 
