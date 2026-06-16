@@ -302,7 +302,7 @@ export const ALL_SERVICES: Service[] = [
   },
   {
     id: 'll2',
-    name: 'Eyelash List and Eyebrow Lamination',
+    name: 'Eyelash Lift and Eyebrow Lamination',
     description: 'The ultimate ocular framing combo: beautifully curved lashes and uniform, lifted model eyebrows.',
     price: '$160',
     length: '75 min',
