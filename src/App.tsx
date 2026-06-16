@@ -344,7 +344,7 @@ const Services = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
                 onClick={() => navigate(`/services#${category.linkHash}`)}
-                className="group bg-white p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-stone-150 hover:border-brand-200 transition-all shadow-sm hover:shadow-xl hover:shadow-brand-600/5 flex flex-col justify-between cursor-pointer"
+                className="group bg-white p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-stone-150 hover:border-brand-300 transition-all shadow-sm hover:shadow-xl hover:shadow-brand-600/5 hover:-translate-y-1 flex flex-col justify-between cursor-pointer"
               >
                 <div>
                   {/* Category Details */}
@@ -358,14 +358,14 @@ const Services = () => {
 
                 {/* Explore Action Link */}
                 <div 
-                  className="pt-3 md:pt-4 border-t border-stone-50 flex items-center justify-between text-brand-700 font-bold text-[11px] md:text-xs hover:text-brand-800 transition-colors group/link"
+                  className="pt-3 md:pt-4 border-t border-stone-50 flex items-center justify-between text-brand-700 font-bold text-[11px] md:text-xs group-hover:text-brand-800 transition-colors"
                 >
                   <span>
                     <span className="hidden sm:inline">View Services Menu</span>
                     <span className="sm:hidden">View Menu</span>
                   </span>
-                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-stone-50 flex items-center justify-center border border-stone-200 group-hover/link:bg-brand-600 group-hover/link:text-white group-hover/link:border-brand-600 transition-all">
-                    <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5" />
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-stone-50 flex items-center justify-center border border-stone-200 group-hover:bg-brand-600 group-hover:text-white group-hover:border-brand-600 group-hover:shadow-md transition-all">
+                    <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </motion.div>
@@ -824,7 +824,7 @@ const Footer = () => {
                 <Phone className="text-brand-500 w-4 h-4 shrink-0" />
                 <span className="text-stone-300 font-medium">(407) 614-8138</span>
               </a>
-              <div className="p-3.5 bg-stone-900/50 border border-stone-800/80 rounded-2xl max-w-[240px] text-center mt-2 animate-pulse-slow">
+              <div className="p-3.5 bg-stone-900/50 border border-stone-800/80 rounded-2xl max-w-[240px] text-center mt-2">
                 <span className="text-[10px] font-extrabold tracking-widest uppercase text-brand-400 block mb-1 font-mono">Service Policy</span>
                 <span className="text-[11px] text-stone-400 font-medium leading-normal block">Walk-ins Welcome &bull; Appointments Recommended</span>
               </div>
