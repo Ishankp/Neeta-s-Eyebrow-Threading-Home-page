@@ -65,8 +65,8 @@ export const FAQS: FAQItemData[] = [
   },
   {
     question: "What is Permanent Makeup, and how is it different from microblading?",
-    answer: "Permanent Makeup (PMU) techniques like Ombre and Powder brows use a delicate digital pen or specialized machine to disperse gentle cosmetic pigment into the uppermost dermis layer of the skin, resulting in a soft, shaded, misty powder pencil look that is beautiful and realistic. Nano combo blends hyper-realistic micro hair stroke channels at the front with soft shading at the arch and tails. Unlike traditional microblading, these advanced PMU methods are much gentler on the skin, last longer (typically 1-3 years), fade more uniformly, and are excellent for all skin types—including oily or sensitive skin.",
-    serviceIds: ["pm1", "pm2", "pm3"]
+    answer: "Permanent Makeup (PMU) techniques like Ombre and Powder brows use a delicate digital pen or specialized machine to disperse gentle cosmetic pigment into the uppermost dermis layer of the skin, resulting in a soft, shaded, misty powder pencil look that is beautiful and realistic. Unlike traditional microblading, these advanced PMU methods are much gentler on the skin, last longer (typically 1-3 years), fade more uniformly, and are excellent for all skin types—including oily or sensitive skin.",
+    serviceIds: ["pm1", "pm2"]
   }
 ];
 
@@ -258,7 +258,7 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
     description: "Congratulations on your permanent makeup/microblading brow service! Following a consistent aftercare routine is the key to preventing irritation, ensuring clean pigment retention, and keeping your beautiful shape crisp for 1 to 3 years.",
     criticalPhase: "First 14 days of active healing",
     expectedResults: "Healed, beautifully defined premium pigment brows lasting 1-3 years",
-    serviceIds: ["pm1", "pm2", "pm3"],
+    serviceIds: ["pm1", "pm2"],
     timeline: [
       {
         time: "Day 1 - 14",

@@ -287,9 +287,9 @@ const SHOWCASE_CATEGORIES = [
   },
   {
     name: "Permanent Makeup",
-    description: "Premium cosmetic shading, soft ombre powder brows, or advanced nano hair stroke combos for flawless beauty.",
-    highlights: ["Soft Ombre Shaded Brows", "Defined Powder Makeup Looks", "Prestige Nano Combo Strokes"],
-    startingPrice: "From $350",
+    description: "Premium cosmetic shading or soft ombre powder brows for flawless beauty.",
+    highlights: ["Soft Ombre Shaded Brows", "Defined Powder Makeup Looks", "Long-lasting 1-3 Years Style"],
+    startingPrice: "From $299",
     linkHash: "Permanent Makeup",
     icon: Wand2,
     colorClass: "text-amber-800 bg-amber-50 border-amber-200"

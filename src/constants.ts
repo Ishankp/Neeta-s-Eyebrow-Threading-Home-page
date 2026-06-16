@@ -76,7 +76,7 @@ export const ALL_SERVICES: Service[] = [
     id: 'tw5',
     name: 'Chin',
     description: 'Smooth and thorough hair removal for a flawless, clean chin.',
-    price: '$12',
+    price: '$10',
     length: '5 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Threading or Waxing'
@@ -94,7 +94,7 @@ export const ALL_SERVICES: Service[] = [
     id: 'tw7',
     name: 'Side Burn',
     description: 'Neat scaling and clean definition of your sideburns for a balanced framing.',
-    price: '$12',
+    price: '$15',
     length: '5 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Threading or Waxing'
@@ -121,7 +121,7 @@ export const ALL_SERVICES: Service[] = [
     id: 'tw10',
     name: 'Forehead',
     description: 'Smooth and clear forehead hair removal for a bright facial frame.',
-    price: '$8',
+    price: '$10',
     length: '5 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Threading or Waxing'
@@ -226,8 +226,8 @@ export const ALL_SERVICES: Service[] = [
     id: 'pm1',
     name: 'Ombre',
     description: 'A semi-permanent shading technique that creates a soft, misty, powder-filled brow look that fades lighter towards the front.',
-    price: '$350',
-    length: '120 min',
+    price: '$299',
+    length: '180 min',
     image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600',
     category: 'Permanent Makeup'
   },
@@ -235,18 +235,9 @@ export const ALL_SERVICES: Service[] = [
     id: 'pm2',
     name: 'Powder',
     description: 'A soft, powdered makeup look with a solid, defined shape—perfect for those who prefer a fuller, more filled-in appearance.',
-    price: '$350',
-    length: '120 min',
+    price: '$299',
+    length: '180 min',
     image: 'https://images.unsplash.com/photo-1542385310-74e2dfda9c1b?auto=format&fit=crop&q=80&w=600',
-    category: 'Permanent Makeup'
-  },
-  {
-    id: 'pm3',
-    name: 'Nano combo',
-    description: 'A premium combination of ultra-realistic micro-nano hair strokes at the front with soft, powdered shading at the arches and tails.',
-    price: '$450',
-    length: '150 min',
-    image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600',
     category: 'Permanent Makeup'
   },
 
@@ -330,29 +321,20 @@ export const ALL_SERVICES: Service[] = [
 
   // Body Wax
   {
+    id: 'bw3',
+    name: 'Brazilian Wax',
+    description: 'Full intimate region hair removal with extra care and maximum hygiene styling.',
+    price: '$60',
+    length: '20 min',
+    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
+    category: 'Body Wax'
+  },
+  {
     id: 'bw1',
     name: 'Bikini Wax',
     description: 'Fast, professional, and hygienic bikini zone hair removal using premium products.',
     price: '$30',
     length: '15 min',
-    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
-    category: 'Body Wax'
-  },
-  {
-    id: 'bw2',
-    name: 'Full Arm Wax',
-    description: 'Complete arm hair removal from shoulder to wrist for silky, touchable skin.',
-    price: '$50',
-    length: '20 min',
-    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
-    category: 'Body Wax'
-  },
-  {
-    id: 'bw3',
-    name: 'Brazillain Wax',
-    description: 'Full intimate region hair removal with extra care and maximum hygiene styling.',
-    price: '$60',
-    length: '20 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Body Wax'
   },
@@ -366,19 +348,19 @@ export const ALL_SERVICES: Service[] = [
     category: 'Body Wax'
   },
   {
-    id: 'bw5',
-    name: 'Half Arm Wax',
-    description: 'Smooth and clean wax for either upper arms or lower arms (forearms).',
-    price: '$30',
-    length: '15 min',
+    id: 'bw2',
+    name: 'Full Arm Wax',
+    description: 'Complete arm hair removal from shoulder to wrist for silky, touchable skin.',
+    price: '$50',
+    length: '20 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Body Wax'
   },
   {
-    id: 'bw6',
-    name: 'Half Leg Wax',
-    description: 'Hair removal targeting either upper thighs or lower calves for smooth skin.',
-    price: '$45',
+    id: 'bw5',
+    name: 'Half Arm Wax',
+    description: 'Thorough hair removal past the elbow to the hand only (does not include the bicep area).',
+    price: '$30',
     length: '15 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Body Wax'
@@ -389,6 +371,15 @@ export const ALL_SERVICES: Service[] = [
     description: 'Complete leg hair removal to produce silky, radiating skin from thighs to ankles.',
     price: '$70',
     length: '25 min',
+    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
+    category: 'Body Wax'
+  },
+  {
+    id: 'bw6',
+    name: 'Half Leg Wax',
+    description: 'Hair removal targeting the calf or the lower leg area only.',
+    price: '$45',
+    length: '15 min',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
     category: 'Body Wax'
   },
