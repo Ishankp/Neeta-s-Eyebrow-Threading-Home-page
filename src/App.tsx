@@ -9,7 +9,8 @@ import {
   Routes,
   Route,
   Link,
-  useNavigate
+  useNavigate,
+  Navigate
 } from 'react-router-dom';
 import { 
   Instagram, 
@@ -82,8 +83,8 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '#' },
-    { name: 'Services', href: '#services' },
+    { name: 'Home', to: '/' },
+    { name: 'Services', to: '/services' },
     { name: 'Aftercare', href: '#aftercare' },
     { name: 'FAQ', href: '#faq' },
     { name: 'Reviews', href: '#reviews' },
@@ -108,17 +109,32 @@ const Navbar = () => {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href} 
-              className={`text-sm font-medium hover:text-brand-500 transition-colors ${
-                isScrolled ? 'text-stone-600' : 'text-white'
-              }`}
-            >
-              {link.name}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            if ('to' in link) {
+              return (
+                <Link
+                  key={link.name}
+                  to={link.to || '/'}
+                  className={`text-sm font-medium hover:text-brand-500 transition-colors ${
+                    isScrolled ? 'text-stone-600' : 'text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            }
+            return (
+              <a 
+                key={link.name} 
+                href={link.href} 
+                className={`text-sm font-medium hover:text-brand-500 transition-colors ${
+                  isScrolled ? 'text-stone-600' : 'text-white'
+                }`}
+              >
+                {link.name}
+              </a>
+            );
+          })}
           <a 
             href="https://square.site/book/SKFJHMBQK1YXY/neeta-s-eyebrow-threading-and-beauty-care-winter-garden-fl" 
             target="_blank" 
@@ -152,16 +168,30 @@ const Navbar = () => {
             className="absolute top-full left-0 right-0 bg-white shadow-xl p-6 md:hidden border-t border-stone-100"
           >
             <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a 
-                  key={link.name} 
-                  href={link.href} 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-stone-800 font-medium py-2 border-b border-stone-50"
-                >
-                  {link.name}
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                if ('to' in link) {
+                  return (
+                    <Link
+                      key={link.name}
+                      to={link.to || '/'}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-stone-800 font-medium py-2 border-b border-stone-50 block text-left"
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                }
+                return (
+                  <a 
+                    key={link.name} 
+                    href={link.href} 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-stone-800 font-medium py-2 border-b border-stone-50 block text-left"
+                  >
+                    {link.name}
+                  </a>
+                );
+              })}
               <a 
                 href="https://square.site/book/SKFJHMBQK1YXY/neeta-s-eyebrow-threading-and-beauty-care-winter-garden-fl" 
                 target="_blank" 
@@ -927,7 +957,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/service" element={<ServicesPage />} />
           <Route path="/aftercare/:id" element={<AftercarePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>
