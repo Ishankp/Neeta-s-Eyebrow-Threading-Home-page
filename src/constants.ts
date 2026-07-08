@@ -176,6 +176,15 @@ export const ALL_SERVICES: Service[] = [
     category: 'Deal Price'
   },
   {
+    id: 'dp8',
+    name: 'Eyebrow, Lip, and Lower Lip Threading/Waxing',
+    description: 'A precision grooming combination covering eyebrows, upper lip, and lower lip alignment for a clean, cohesive look.',
+    price: '$29',
+    length: '15 min',
+    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600',
+    category: 'Deal Price'
+  },
+  {
     id: 'dp3',
     name: 'Eyebrow and Lip Threading/Waxing + Eyebrow Tinting',
     description: 'The ultimate definition package: shape face brows/lips and tint for a rich, styled look.',

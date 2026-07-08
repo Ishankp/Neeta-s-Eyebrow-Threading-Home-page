@@ -60,183 +60,208 @@ const FALLBACK_REVIEWS = [
   }
 ];
 
+interface ReviewsCache {
+  timestamp: number;
+  rating: number;
+  totalReviews: number;
+  reviews: any[];
+  isFallback: boolean;
+}
+
+let memoryCache: ReviewsCache | null = null;
+let activeFetchPromise: Promise<ReviewsCache> | null = null;
+
 // Endpoint for fetching cached daily 5-star reviews
 app.get('/api/reviews', async (req, res) => {
   try {
-    let cachedData: any = null;
-    let useCache = false;
     const forceRefresh = req.query.refresh === 'true';
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const placeId = process.env.GOOGLE_PLACE_ID || DEFAULT_PLACE_ID;
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const now = Date.now();
 
-    if (!forceRefresh && await fs.pathExists(CACHE_FILE)) {
-      try {
-        cachedData = await fs.readJson(CACHE_FILE);
-        if (cachedData && cachedData.timestamp) {
-          const ageMs = Date.now() - cachedData.timestamp;
-          const oneDayMs = 24 * 60 * 60 * 1000;
-          
-          if (ageMs < oneDayMs) {
-            // Only use cache if it wasn't a fallback, or if we STILL don't have an API key anyway
-            const wasFallback = cachedData.isFallback === true;
-            if (!apiKey || !wasFallback) {
-              useCache = true;
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('Error reading reviews cache, will fetch fresh:', err);
-      }
-    }
+    // Check if memory cache is valid
+    const hasValidCache = memoryCache && 
+      (now - memoryCache.timestamp < oneDayMs) && 
+      (!memoryCache.isFallback || !apiKey);
 
-    if (useCache && cachedData) {
+    if (!forceRefresh && hasValidCache && memoryCache) {
       return res.json({
-        rating: cachedData.rating || 4.9,
-        totalReviews: cachedData.totalReviews || 850,
-        reviews: cachedData.reviews || FALLBACK_REVIEWS
+        rating: memoryCache.rating,
+        totalReviews: memoryCache.totalReviews,
+        reviews: memoryCache.reviews
       });
     }
 
-    if (!apiKey) {
-      const cacheObj = {
-        timestamp: Date.now(),
-        rating: 4.9,
-        totalReviews: 850,
-        reviews: FALLBACK_REVIEWS,
-        isFallback: true
-      };
-      await fs.writeJson(CACHE_FILE, cacheObj, { spaces: 2 });
-      return res.json({ rating: 4.9, totalReviews: 850, reviews: FALLBACK_REVIEWS });
+    // Coalesce concurrent requests: if a fetch is already in progress, wait for it
+    if (activeFetchPromise) {
+      console.log('Coalescing concurrent reviews fetch request...');
+      const result = await activeFetchPromise;
+      return res.json({
+        rating: result.rating,
+        totalReviews: result.totalReviews,
+        reviews: result.reviews
+      });
     }
 
-    let liveRating = 4.9;
-    let liveTotal = 850;
-    let rawReviews: any[] = [];
-    let fetchedSuccessfully = false;
-
-    // 1. Try Classic Place Details API with reviews_sort=newest to fetch most recent reviews
-    try {
-      console.log(`Fetching from Classic Google Place Details API for place ID: ${placeId}...`);
-      const classicUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&reviews_sort=newest&key=${apiKey}`;
-      const classicResponse = await axios.get(classicUrl, { timeout: 10000 });
-      const classicData = classicResponse.data;
-      
-      if (classicData.status === 'OK' && classicData.result) {
-        const result = classicData.result;
-        liveRating = result.rating || 4.9;
-        liveTotal = result.user_ratings_total || 850;
-        const reviewsArr = result.reviews || [];
-        
-        rawReviews = reviewsArr.map((r: any, idx: number) => ({
-          id: r.time ? `legacy-${r.time}-${idx}` : `legacy-${idx}`,
-          author: r.author_name || 'Anonymous',
-          rating: r.rating || 5,
-          comment: r.text || '',
-          date: r.relative_time_description || 'Recent',
-          avatar: r.profile_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-          timestamp: r.time * 1000 || 0
-        }));
-        fetchedSuccessfully = true;
-        console.log(`Successfully fetched ${rawReviews.length} reviews from Classic Places API.`);
-      } else {
-        console.warn('Classic Place Details API returned status:', classicData.status, classicData.error_message || '');
-      }
-    } catch (classicErr: any) {
-      console.error('Error fetching from Classic Place Details API:', classicErr.message || classicErr);
-    }
-
-    // 2. Fall back to New Places API v1 if Classic didn't succeed
-    if (!fetchedSuccessfully) {
+    // Start a single fetch promise
+    activeFetchPromise = (async (): Promise<ReviewsCache> => {
       try {
-        console.log(`Falling back to New Places API v1 for place ID: ${placeId}...`);
-        const response = await axios.get(`https://places.googleapis.com/v1/places/${placeId}`, {
-          headers: {
-            'X-Goog-Api-Key': apiKey,
-            'X-Goog-FieldMask': 'reviews,rating,userRatingCount'
-          },
-          timeout: 10000
-        });
-
-        const data = response.data;
-        liveRating = data.rating || 4.9;
-        liveTotal = data.userRatingCount || 850;
-        const reviewsArr = data.reviews || [];
-
-        rawReviews = reviewsArr.map((r: any, idx: number) => ({
-          id: r.name || `live-${idx}`,
-          author: r.authorAttribution?.displayName || 'Anonymous',
-          rating: r.rating || 5,
-          comment: r.text?.text || r.originalText?.text || '',
-          date: r.relativePublishTimeDescription || 'Recent',
-          avatar: r.authorAttribution?.photoUri || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-          timestamp: r.publishTime ? new Date(r.publishTime).getTime() : 0
-        }));
-        fetchedSuccessfully = true;
-        console.log(`Successfully fetched ${rawReviews.length} reviews from New Places API.`);
-      } catch (v1Err: any) {
-        console.error('Error fetching from New Places API v1:', v1Err.message || v1Err);
-      }
-    }
-
-    // Sort raw reviews by timestamp descending to ensure the absolute most recent ones are evaluated first
-    const sortedRawReviews = [...rawReviews].sort((a: any, b: any) => b.timestamp - a.timestamp);
-
-    // Filter to get only 5-star rating reviews
-    let processedReviews = sortedRawReviews
-      .filter((r: any) => r.rating === 5)
-      .map((r: any) => ({
-        id: r.id,
-        author: r.author,
-        rating: r.rating,
-        comment: r.comment,
-        date: r.date,
-        avatar: r.avatar,
-        timestamp: r.timestamp
-      }));
-
-    // Pad if there are less than 5 items
-    if (processedReviews.length < 5) {
-      for (const fb of FALLBACK_REVIEWS) {
-        if (processedReviews.length >= 5) break;
-        if (!processedReviews.some((r: any) => r.author.toLowerCase() === fb.author.toLowerCase())) {
-          processedReviews.push({
-            id: fb.id,
-            author: fb.author,
-            rating: fb.rating,
-            comment: fb.comment,
-            date: fb.date,
-            avatar: fb.avatar,
-            timestamp: undefined
-          });
+        if (!apiKey) {
+          return {
+            timestamp: Date.now(),
+            rating: 4.9,
+            totalReviews: 850,
+            reviews: FALLBACK_REVIEWS,
+            isFallback: true
+          };
         }
+
+        let liveRating = 4.9;
+        let liveTotal = 850;
+        let rawReviews: any[] = [];
+        let fetchedSuccessfully = false;
+
+        // 1. Try Classic Place Details API with reviews_sort=newest
+        try {
+          console.log(`Fetching from Classic Google Place Details API for place ID: ${placeId}...`);
+          const classicUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&reviews_sort=newest&key=${apiKey}`;
+          const classicResponse = await axios.get(classicUrl, { timeout: 8000 });
+          const classicData = classicResponse.data;
+          
+          if (classicData.status === 'OK' && classicData.result) {
+            const result = classicData.result;
+            liveRating = result.rating || 4.9;
+            liveTotal = result.user_ratings_total || 850;
+            const reviewsArr = result.reviews || [];
+            
+            rawReviews = reviewsArr.map((r: any, idx: number) => ({
+              id: r.time ? `legacy-${r.time}-${idx}` : `legacy-${idx}`,
+              author: r.author_name || 'Anonymous',
+              rating: r.rating || 5,
+              comment: r.text || '',
+              date: r.relative_time_description || 'Recent',
+              avatar: r.profile_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+              timestamp: r.time * 1000 || 0
+            }));
+            fetchedSuccessfully = true;
+            console.log(`Successfully fetched ${rawReviews.length} reviews from Classic Places API.`);
+          } else {
+            console.warn('Classic Place Details API returned status:', classicData.status, classicData.error_message || '');
+          }
+        } catch (classicErr: any) {
+          console.error('Error fetching from Classic Place Details API:', classicErr.message || classicErr);
+        }
+
+        // 2. Fall back to New Places API v1 if Classic didn't succeed
+        if (!fetchedSuccessfully) {
+          try {
+            console.log(`Falling back to New Places API v1 for place ID: ${placeId}...`);
+            const response = await axios.get(`https://places.googleapis.com/v1/places/${placeId}`, {
+              headers: {
+                'X-Goog-Api-Key': apiKey,
+                'X-Goog-FieldMask': 'reviews,rating,userRatingCount'
+              },
+              timeout: 8000
+            });
+
+            const data = response.data;
+            liveRating = data.rating || 4.9;
+            liveTotal = data.userRatingCount || 850;
+            const reviewsArr = data.reviews || [];
+
+            rawReviews = reviewsArr.map((r: any, idx: number) => ({
+              id: r.name || `live-${idx}`,
+              author: r.authorAttribution?.displayName || 'Anonymous',
+              rating: r.rating || 5,
+              comment: r.text?.text || r.originalText?.text || '',
+              date: r.relativePublishTimeDescription || 'Recent',
+              avatar: r.authorAttribution?.photoUri || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+              timestamp: r.publishTime ? new Date(r.publishTime).getTime() : 0
+            }));
+            fetchedSuccessfully = true;
+            console.log(`Successfully fetched ${rawReviews.length} reviews from New Places API.`);
+          } catch (v1Err: any) {
+            console.error('Error fetching from New Places API v1:', v1Err.message || v1Err);
+          }
+        }
+
+        const sortedRawReviews = [...rawReviews].sort((a: any, b: any) => b.timestamp - a.timestamp);
+
+        let processedReviews = sortedRawReviews
+          .filter((r: any) => r.rating === 5)
+          .map((r: any) => ({
+            id: r.id,
+            author: r.author,
+            rating: r.rating,
+            comment: r.comment,
+            date: r.date,
+            avatar: r.avatar,
+            timestamp: r.timestamp
+          }));
+
+        if (processedReviews.length < 5) {
+          for (const fb of FALLBACK_REVIEWS) {
+            if (processedReviews.length >= 5) break;
+            if (!processedReviews.some((r: any) => r.author.toLowerCase() === fb.author.toLowerCase())) {
+              processedReviews.push({
+                id: fb.id,
+                author: fb.author,
+                rating: fb.rating,
+                comment: fb.comment,
+                date: fb.date,
+                avatar: fb.avatar,
+                timestamp: undefined
+              });
+            }
+          }
+        }
+
+        processedReviews = processedReviews.slice(0, 5);
+
+        return {
+          timestamp: Date.now(),
+          rating: liveRating,
+          totalReviews: liveTotal,
+          reviews: processedReviews,
+          isFallback: !fetchedSuccessfully
+        };
+      } catch (err: any) {
+        console.error('Inner fetch error:', err.message || err);
+        return {
+          timestamp: Date.now(),
+          rating: memoryCache?.rating || 4.9,
+          totalReviews: memoryCache?.totalReviews || 850,
+          reviews: memoryCache?.reviews || FALLBACK_REVIEWS,
+          isFallback: true
+        };
       }
+    })();
+
+    try {
+      const result = await activeFetchPromise;
+      memoryCache = result;
+      
+      // Keep disk cache as an asynchronous background task only, completely non-blocking
+      fs.writeJson(CACHE_FILE, result, { spaces: 2 }).catch(writeErr => {
+        console.warn('Background reviews cache write failed:', writeErr.message || writeErr);
+      });
+
+      return res.json({
+        rating: result.rating,
+        totalReviews: result.totalReviews,
+        reviews: result.reviews
+      });
+    } finally {
+      activeFetchPromise = null;
     }
-
-    // Limit strictly to up to 5 reviews
-    processedReviews = processedReviews.slice(0, 5);
-
-    const cacheObj = {
-      timestamp: Date.now(),
-      rating: liveRating,
-      totalReviews: liveTotal,
-      reviews: processedReviews,
-      isFallback: !fetchedSuccessfully
-    };
-
-    await fs.writeJson(CACHE_FILE, cacheObj, { spaces: 2 });
-
-    return res.json({
-      rating: liveRating,
-      totalReviews: liveTotal,
-      reviews: processedReviews
-    });
 
   } catch (apiErr: any) {
-    console.error('Error fetching from Google Places API:', apiErr.message || apiErr);
+    console.error('Outer reviews endpoint error:', apiErr.message || apiErr);
     
-    // Graceful expired cache read
-    if (await fs.pathExists(CACHE_FILE)) {
-      try {
+    // Attempt local file cache read as a fallback of fallback
+    try {
+      if (await fs.pathExists(CACHE_FILE)) {
         const expiredCache = await fs.readJson(CACHE_FILE);
         if (expiredCache && expiredCache.reviews) {
           return res.json({
@@ -245,9 +270,9 @@ app.get('/api/reviews', async (req, res) => {
             reviews: expiredCache.reviews
           });
         }
-      } catch (readErr) {
-        // ignore
       }
+    } catch (readErr) {
+      // ignore
     }
 
     return res.json({

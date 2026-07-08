@@ -46,7 +46,7 @@ export const FAQS: FAQItemData[] = [
   {
     question: "What is the difference between waxing and threading? And how do I know which one I should get?",
     answer: "Threading is an organic hair removal technique using a twisted cotton thread to precisely pluck individual hairs from the root; it causes zero skin lifting, which makes it perfect for sensitive facial zones and sharp eyebrow mapping. Waxing uses clean, warm resin wax to clear entire patches of unwanted hair quickly. We recommend threading for your facial contours, and waxing for larger body areas (or if you prefer a single quick pull).",
-    serviceIds: ["tw1", "tw2", "tw3", "tw4", "tw5", "tw6", "tw7", "tw8", "tw9", "tw10", "tw11", "bw1", "bw2", "bw3", "bw4", "bw5", "bw6", "bw7", "bw8", "dp1", "dp2", "dp5", "dp7"]
+    serviceIds: ["tw1", "tw2", "tw3", "tw4", "tw5", "tw6", "tw7", "tw8", "tw9", "tw10", "tw11", "bw1", "bw2", "bw3", "bw4", "bw5", "bw6", "bw7", "bw8", "dp1", "dp2", "dp8", "dp5", "dp7"]
   },
   {
     question: "How long does eyebrow tinting last, and how does it work?",
@@ -165,7 +165,7 @@ export const AFTERCARE_GUIDES: AftercareGuide[] = [
     description: "We are thrilled you chose us for your waxing service today! We understand that having your skin waxed can feel like a big step, but rest assured, our professional techniques are designed with your safety and comfort as our top priority. Because your skin has just undergone a thorough exfoliation and hair removal process, it is currently in a delicate state. Following a consistent aftercare routine is the secret to preventing irritation, avoiding ingrown hairs, and ensuring your skin stays silky smooth for as long as possible.",
     criticalPhase: "First 24–48 hours of delicate care",
     expectedResults: "Silky smooth, irritation-free, healthy & glowing skin",
-    serviceIds: ["tw1", "tw2", "tw3", "tw4", "tw5", "tw6", "tw7", "tw8", "tw9", "tw10", "tw11", "bw1", "bw2", "bw3", "bw4", "bw5", "bw6", "bw7", "bw8", "dp1", "dp2", "dp5", "dp7"],
+    serviceIds: ["tw1", "tw2", "tw3", "tw4", "tw5", "tw6", "tw7", "tw8", "tw9", "tw10", "tw11", "bw1", "bw2", "bw3", "bw4", "bw5", "bw6", "bw7", "bw8", "dp1", "dp2", "dp8", "dp5", "dp7"],
     timeline: [
       {
         time: "First 24 Hours",
